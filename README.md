@@ -438,8 +438,7 @@ function explore() {
         const item = getRandomItem();
         showGameModal(`Você encontrou uma ${item.name}! Efeito: ${item.effect}`);
     }
-}
-
+    
 // Função para obter um inimigo aleatório
 function getRandomEnemy() {
     const enemies = gameData.dungeons.find(d => d.name === gameState.currentDungeon).enemyTypes;
