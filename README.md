@@ -423,4 +423,31 @@
         }
 
         // Event listener para o botão OK do modal
-        modalOkButton.addEventListener('click', () =>
+        modalOkButton.addEventListener('click', () => 
+        // Função para explorar e encontrar itens ou inimigos
+function explore() {
+    if (!gameState.gameStarted) return;
+
+    const randomEvent = Math.random();
+    if (randomEvent < 0.5) {
+        // Encontrar um inimigo
+        const enemyType = getRandomEnemy();
+        startBattle(enemyType);
+    } else {
+        // Encontrar um item
+        const item = getRandomItem();
+        showGameModal(`Você encontrou uma ${item.name}! Efeito: ${item.effect}`);
+    }
+}
+
+// Função para obter um inimigo aleatório
+function getRandomEnemy() {
+    const enemies = gameData.dungeons.find(d => d.name === gameState.currentDungeon).enemyTypes;
+    return enemies[Math.floor(Math.random() * enemies.length)];
+}
+
+// Função para obter um item aleatório
+function getRandomItem() {
+    const items = Object.values(gameData.items);
+    return items[Math.floor(Math.random() * items.length)];
+}
