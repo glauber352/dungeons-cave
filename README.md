@@ -195,33 +195,17 @@
             <h1>DUNGEONS CAVE</h1>
             <p class="text-center italic mb-4">"Aventure-se nas profundezas... se tiver coragem."</p>
 
-            <div class="panel">
-                <h2 class="text-xl">🗺️ História</h2>
-                <p class="text-sm">Há milênios, uma série de cavernas interconectadas conhecidas como Dungeons Cave surgiu após um cataclismo mágico. Dentro delas, residem criaturas ancestrais, artefatos proibidos e poderes capazes de alterar o mundo. A cada geração, heróis descem às profundezas em busca de glória, fortuna... ou redenção.</p>
-            </div>
+            <button id="start-game-button" class="pixel-button mt-6">Escolher Classe</button>
+        </div>
 
-            <div class="panel">
-                <h2 class="text-xl">🏹 Classes Jogáveis</h2>
-                <table class="text-sm">
-                    <thead>
-                        <tr>
-                            <th>Classe</th>
-                            <th>Descrição</th>
-                            <th>Habilidade Especial</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>Cavaleiro</td><td>Tanque, defesa alta, espada e escudo.</td><td>Escudo Imbatível — bloqueia 100% do dano por 5s.</td></tr>
-                        <tr><td>Ladino</td><td>Ágil, furtivo, dano crítico alto.</td><td>Desaparecer — fica invisível por 7s.</td></tr>
-                        <tr><td>Mago</td><td>Mestre dos elementos, dano mágico em área.</td><td>Tempestade Arcana — chuva de raios.</td></tr>
-                        <tr><td>Clérigo</td><td>Suporte, cura, buffs e dano sagrado.</td><td>Bênção Divina — cura e remove efeitos negativos.</td></tr>
-                        <tr><td>Bárbaro</td><td>Selvagem, dano físico bruto, pouca defesa.</td><td>Fúria Insana — dobra o dano por 10s, mas perde defesa.</td></tr>
-                        <tr><td>Caçador</td><td>Longo alcance, armadilhas e animais de suporte.</td><td>Falcão Espreitador — invoca um falcão que ataca e revela inimigos ocultos.</td></tr>
-                    </tbody>
-                </table>
+        <div id="class-selection-modal" class="modal">
+            <div class="modal-content">
+                <h2>Escolha sua Classe</h2>
+                <div id="class-options" class="flex flex-col gap-2">
+                    <!-- As opções de classe serão inseridas aqui -->
+                </div>
+                <button id="modal-class-ok-button" class="pixel-button">Confirmar Classe</button>
             </div>
-
-            <button id="start-game-button" class="pixel-button mt-6">Iniciar Aventura</button>
         </div>
 
         <div id="game-screen">
@@ -295,6 +279,8 @@
         const startScreen = document.getElementById('start-screen');
         const gameScreen = document.getElementById('game-screen');
         const startGameButton = document.getElementById('start-game-button');
+        const classSelectionModal = document.getElementById('class-selection-modal');
+        const classOptionsDiv = document.getElementById('class-options');
         const playerStatsDiv = document.getElementById('player-stats');
         const enemyInfoDiv = document.getElementById('enemy-info');
         const enemyNameSpan = document.getElementById('enemy-name');
@@ -323,15 +309,28 @@
 
         // Iniciar o jogo
         startGameButton.addEventListener('click', () => {
-            gameState.player = prompt("Escolha sua classe: Cavaleiro, Ladino, Mago, Clérigo, Bárbaro, Caçador").toLowerCase();
-            if (gameData.classes[gameState.player]) {
-                gameState.gameStarted = true;
-                gameState.currentDungeon = gameData.dungeons[0]; // Começa na primeira dungeon
-                startGame();
-            } else {
-                showGameModal("Classe inválida! Tente novamente.");
-            }
+            showClassSelection();
         });
+
+        function showClassSelection() {
+            classOptionsDiv.innerHTML = ''; // Limpa as opções anteriores
+            for (const key in gameData.classes) {
+                const classButton = document.createElement('button');
+                classButton.textContent = gameData.classes[key].name;
+                classButton.className = 'pixel-button';
+                classButton.onclick = () => selectClass(key);
+                classOptionsDiv.appendChild(classButton);
+            }
+            classSelectionModal.style.display = 'block';
+        }
+
+        function selectClass(classKey) {
+            gameState.player = classKey;
+            gameState.gameStarted = true;
+            gameState.currentDungeon = gameData.dungeons[0]; // Começa na primeira dungeon
+            classSelectionModal.style.display = 'none';
+            startGame();
+        }
 
         function startGame() {
             startScreen.style.display = 'none';
@@ -396,5 +395,11 @@
             logEvent(`${gameState.currentEnemy.name} atacou você e causou ${damage} de dano!`);
         }
 
-        function collectItem() {
-            const items = ["Poção
+        function logEvent(message) {
+            gameState.gameLog.push(message);
+            gameLogDiv.innerHTML += `<p>${message}</p>`;
+            gameLogDiv.scrollTop = gameLogDiv.scrollHeight; // Rolagem automática
+        }
+    </script>
+</body>
+</html>
