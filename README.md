@@ -274,6 +274,7 @@
                 goblin: { name: "Goblin", hp: 30, attack: 5 },
                 giantBat: { name: "Morcego Gigante", hp: 25, attack: 6 },
                 venomousSpider: { name: "Aranha Venenosa", hp: 35, attack: 7 },
+                boss: { name: "Gorak, O Devorador", hp: 100, attack: 15 } // Boss
             },
             dungeons: [
                 { name: "Caverna Sombria", levels: "1-5", boss: "Gorak, O Devorador", enemyTypes: ["goblin", "giantBat", "venomousSpider"] },
@@ -287,6 +288,7 @@
             currentEnemy: null,
             gameStarted: false,
             gameLog: [],
+            items: [], // Array para itens coletados
         };
 
         // Referências aos elementos HTML
@@ -343,6 +345,7 @@
             playerStatsDiv.innerHTML = `
                 <span>${playerClass.name}</span>
                 <span>HP: ${playerClass.baseHp}</span>
+                <span>Itens: ${gameState.items.length}</span>
             `;
         }
 
@@ -371,7 +374,7 @@
         attackButton.addEventListener('click', () => {
             if (!gameState.currentEnemy) return;
             const playerClass = gameData.classes[gameState.player];
-            const damage = playerClass.baseAttack - gameState.currentEnemy.attack;
+            const damage = Math.max(0, playerClass.baseAttack - gameState.currentEnemy.attack);
             gameState.currentEnemy.hp -= damage;
             logEvent(`Você atacou ${gameState.currentEnemy.name} e causou ${damage} de dano!`);
             if (gameState.currentEnemy.hp <= 0) {
@@ -381,6 +384,7 @@
                 attackButton.disabled = true;
                 abilityButton.disabled = true;
                 fleeButton.disabled = true;
+                collectItem(); // Coleta um item ao derrotar um inimigo
             } else {
                 enemyAttack();
             }
@@ -388,18 +392,9 @@
 
         function enemyAttack() {
             const playerClass = gameData.classes[gameState.player];
-            const damage = gameState.currentEnemy.attack - playerClass.baseDefense;
-            if (damage > 0) {
-                logEvent(`${gameState.currentEnemy.name} atacou você e causou ${damage} de dano!`);
-            } else {
-                logEvent(`${gameState.currentEnemy.name} não conseguiu causar dano!`);
-            }
+            const damage = Math.max(0, gameState.currentEnemy.attack - playerClass.baseDefense);
+            logEvent(`${gameState.currentEnemy.name} atacou você e causou ${damage} de dano!`);
         }
 
-        function logEvent(message) {
-            gameState.gameLog.push(message);
-            gameLogDiv.innerHTML += `<p>${message}</p>`;
-            gameLogDiv.scrollTop = gameLogDiv.scrollHeight; // Rolagem automática
-        }
-    </script>
-</body>
+        function collectItem() {
+            const items = ["Poção
