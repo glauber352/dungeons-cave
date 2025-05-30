@@ -221,89 +221,6 @@
                 </table>
             </div>
 
-            <div class="panel">
-                <h2 class="text-xl">⚔️ Armas</h2>
-                <table class="text-sm">
-                    <thead>
-                        <tr>
-                            <th>Arma</th>
-                            <th>Classes</th>
-                            <th>Efeito Especial</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>Espada Longa</td><td>Cavaleiro</td><td>+10% chance de atordoar.</td></tr>
-                        <tr><td>Adaga Sombria</td><td>Ladino</td><td>+20% de dano em ataques críticos.</td></tr>
-                        <tr><td>Cajado Elemental</td><td>Mago</td><td>Conjura 2 feitiços ao mesmo tempo.</td></tr>
-                        <tr><td>Martelo Sagrado</td><td>Clérigo</td><td>Cura aliados próximos a cada golpe.</td></tr>
-                        <tr><td>Machado Duplo</td><td>Bárbaro</td><td>Chance de causar sangramento.</td></tr>
-                        <tr><td>Arco de Ébano</td><td>Caçador</td><td>Tiros perfuram múltiplos inimigos.</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="panel">
-                <h2 class="text-xl">👥 Personagens Importantes</h2>
-                <table class="text-sm">
-                    <thead>
-                        <tr>
-                            <th>Nome</th>
-                            <th>Função</th>
-                            <th>Descrição</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>Eldric</td><td>Mestre da Guilda</td><td>Guia os aventureiros; ex-herói lendário.</td></tr>
-                        <tr><td>Maelis</td><td>Mercadora</td><td>Vende poções, itens e armas raras.</td></tr>
-                        <tr><td>Sif</td><td>Ferreiro</td><td>Forja armas e melhora equipamentos.</td></tr>
-                        <tr><td>Lyria</td><td>Curandeira</td><td>Cura os aventureiros na cidade.</td></tr>
-                        <tr><td>Darkan</td><td>Antagonista Final</td><td>Um ex-mago que virou um lich nas profundezas.</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="panel">
-                <h2 class="text-xl">🐉 Chefões (BOSS)</h2>
-                <table class="text-sm">
-                    <thead>
-                        <tr>
-                            <th>Dungeon</th>
-                            <th>Boss</th>
-                            <th>Mecânicas</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>Caverna Sombria</td><td>Gorak, O Devorador</td><td>Devora jogadores, cria clones de sombras.</td></tr>
-                        <tr><td>Túnel das Serpentes</td><td>Ssyra, A Rainha Víbora</td><td>Veneno em área, invoca serpentes menores.</td></tr>
-                        <tr><td>Poço de Lava</td><td>Vulkanor, O Imolado</td><td>Pisos de lava, rajadas de fogo e erupções.</td></tr>
-                        <tr><td>Abismo Gélido</td><td>Frostfang, O Congelador</td><td>Congela jogadores, cria espinhos de gelo.</td></tr>
-                        <tr><td>Sala do Lich</td><td>Darkan, O Lich Supremo</td><td>Necromancia, invoca mortos, tempestade arcana.</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="panel">
-                <h2 class="text-xl">🕸️ Dungeons</h2>
-                <ul class="list-disc list-inside text-sm">
-                    <li>Caverna Sombria — iniciantes, nível 1-5.</li>
-                    <li>Túnel das Serpentes — intermediário, nível 5-10.</li>
-                    <li>Poço de Lava — nível 10-15, perigo constante.</li>
-                    <li>Abismo Gélido — nível 15-20, ambiente hostil e traiçoeiro.</li>
-                    <li>Sala do Lich (Darkan’s Sanctum) — nível 20+, dungeon final, cheia de puzzles, armadilhas e o boss final.</li>
-                </ul>
-            </div>
-
-            <div class="panel">
-                <h2 class="text-xl">🏆 Sistemas Adicionais</h2>
-                <ul class="list-disc list-inside text-sm">
-                    <li>🎯 Crafting de armas e armaduras.</li>
-                    <li>💎 Loot aleatório com raridade (comum, raro, épico, lendário).</li>
-                    <li>🛡️ Sistema de guildas e grupos.</li>
-                    <li>🌟 Missões secundárias e eventos aleatórios nas dungeons.</li>
-                    <li>🔥 Modo Hardcore (morte permanente).</li>
-                </ul>
-            </div>
-
             <button id="start-game-button" class="pixel-button mt-6">Iniciar Aventura</button>
         </div>
 
@@ -353,4 +270,136 @@
                 barbarian: { name: "Bárbaro", description: "Selvagem, dano físico bruto, pouca defesa.", ability: "Fúria Insana", baseHp: 110, baseAttack: 28, baseDefense: 4 },
                 hunter: { name: "Caçador", description: "Longo alcance, armadilhas e animais de suporte.", ability: "Falcão Espreitador", baseHp: 85, baseAttack: 22, baseDefense: 6 }
             },
-            weapons: {
+            enemies: {
+                goblin: { name: "Goblin", hp: 30, attack: 5 },
+                giantBat: { name: "Morcego Gigante", hp: 25, attack: 6 },
+                venomousSpider: { name: "Aranha Venenosa", hp: 35, attack: 7 },
+            },
+            dungeons: [
+                { name: "Caverna Sombria", levels: "1-5", boss: "Gorak, O Devorador", enemyTypes: ["goblin", "giantBat", "venomousSpider"] },
+            ],
+        };
+
+        // Estado do jogo
+        const gameState = {
+            player: null,
+            currentDungeon: null,
+            currentEnemy: null,
+            gameStarted: false,
+            gameLog: [],
+        };
+
+        // Referências aos elementos HTML
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const startGameButton = document.getElementById('start-game-button');
+        const playerStatsDiv = document.getElementById('player-stats');
+        const enemyInfoDiv = document.getElementById('enemy-info');
+        const enemyNameSpan = document.getElementById('enemy-name');
+        const enemyHpSpan = document.getElementById('enemy-hp');
+        const gameLogDiv = document.getElementById('game-log');
+        const exploreButton = document.getElementById('explore-button');
+        const attackButton = document.getElementById('attack-button');
+        const abilityButton = document.getElementById('ability-button');
+        const fleeButton = document.getElementById('flee-button');
+
+        // Referências do modal
+        const gameModal = document.getElementById('game-modal');
+        const modalMessage = document.getElementById('modal-message');
+        const modalOkButton = document.getElementById('modal-ok-button');
+
+        // Função para exibir o modal
+        function showGameModal(message) {
+            modalMessage.textContent = message;
+            gameModal.style.display = 'block';
+        }
+
+        // Event listener para o botão OK do modal
+        modalOkButton.addEventListener('click', () => {
+            gameModal.style.display = 'none';
+        });
+
+        // Iniciar o jogo
+        startGameButton.addEventListener('click', () => {
+            gameState.player = prompt("Escolha sua classe: Cavaleiro, Ladino, Mago, Clérigo, Bárbaro, Caçador").toLowerCase();
+            if (gameData.classes[gameState.player]) {
+                gameState.gameStarted = true;
+                gameState.currentDungeon = gameData.dungeons[0]; // Começa na primeira dungeon
+                startGame();
+            } else {
+                showGameModal("Classe inválida! Tente novamente.");
+            }
+        });
+
+        function startGame() {
+            startScreen.style.display = 'none';
+            gameScreen.style.display = 'flex';
+            updatePlayerStats();
+            logEvent(`Você começou sua aventura como ${gameData.classes[gameState.player].name}!`);
+        }
+
+        function updatePlayerStats() {
+            const playerClass = gameData.classes[gameState.player];
+            playerStatsDiv.innerHTML = `
+                <span>${playerClass.name}</span>
+                <span>HP: ${playerClass.baseHp}</span>
+            `;
+        }
+
+        exploreButton.addEventListener('click', () => {
+            if (!gameState.gameStarted) return;
+            const enemyType = getRandomEnemy();
+            startBattle(enemyType);
+        });
+
+        function getRandomEnemy() {
+            const enemies = gameState.currentDungeon.enemyTypes;
+            const randomEnemyKey = enemies[Math.floor(Math.random() * enemies.length)];
+            return gameData.enemies[randomEnemyKey];
+        }
+
+        function startBattle(enemy) {
+            gameState.currentEnemy = enemy;
+            enemyNameSpan.textContent = enemy.name;
+            enemyHpSpan.textContent = `HP: ${enemy.hp}`;
+            attackButton.disabled = false;
+            abilityButton.disabled = false;
+            fleeButton.disabled = false;
+            logEvent(`Um ${enemy.name} apareceu!`);
+        }
+
+        attackButton.addEventListener('click', () => {
+            if (!gameState.currentEnemy) return;
+            const playerClass = gameData.classes[gameState.player];
+            const damage = playerClass.baseAttack - gameState.currentEnemy.attack;
+            gameState.currentEnemy.hp -= damage;
+            logEvent(`Você atacou ${gameState.currentEnemy.name} e causou ${damage} de dano!`);
+            if (gameState.currentEnemy.hp <= 0) {
+                logEvent(`${gameState.currentEnemy.name} foi derrotado!`);
+                enemyNameSpan.textContent = "Nenhum Inimigo";
+                enemyHpSpan.textContent = "HP: --";
+                attackButton.disabled = true;
+                abilityButton.disabled = true;
+                fleeButton.disabled = true;
+            } else {
+                enemyAttack();
+            }
+        });
+
+        function enemyAttack() {
+            const playerClass = gameData.classes[gameState.player];
+            const damage = gameState.currentEnemy.attack - playerClass.baseDefense;
+            if (damage > 0) {
+                logEvent(`${gameState.currentEnemy.name} atacou você e causou ${damage} de dano!`);
+            } else {
+                logEvent(`${gameState.currentEnemy.name} não conseguiu causar dano!`);
+            }
+        }
+
+        function logEvent(message) {
+            gameState.gameLog.push(message);
+            gameLogDiv.innerHTML += `<p>${message}</p>`;
+            gameLogDiv.scrollTop = gameLogDiv.scrollHeight; // Rolagem automática
+        }
+    </script>
+</body>
