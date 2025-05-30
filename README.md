@@ -400,6 +400,14 @@
             gameLogDiv.innerHTML += `<p>${message}</p>`;
             gameLogDiv.scrollTop = gameLogDiv.scrollHeight; // Rolagem automática
         }
+
+        function collectItem() {
+            const items = ["Poção de Vida", "Espada Antiga", "Escudo de Madeira"];
+            const randomItem = items[Math.floor(Math.random() * items.length)];
+            gameState.items.push(randomItem);
+            logEvent(`Você coletou um item: ${randomItem}`);
+            updatePlayerStats();
+        }
     </script>
 </body>
 </html>
