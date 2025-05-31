@@ -180,6 +180,24 @@
             flex-grow: 1; /* Permite que os botões cresçam para preencher o espaço */
             max-width: 200px; /* Limita o tamanho máximo dos botões */
         }
+
+        /* Estilos para a mochila */
+        .inventory {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .inventory-item {
+            background-color: #1a242f;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            border: 1px solid #555;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
     </style>
 </head>
 <body class="selection:bg-yellow-400 selection:text-black">
@@ -320,6 +338,11 @@
             </div>
 
             <div class="panel">
+                <h3 class="text-lg">Mochila</h3>
+                <div id="inventory" class="inventory"></div>
+            </div>
+
+            <div class="panel">
                 <h3 class="text-lg">Registro de Eventos</h3>
                 <div id="game-log" class="game-log">
                     <p>Bem-vindo à Dungeons Cave! Escolha uma classe para começar.</p>
@@ -375,6 +398,7 @@
         const attackButton = document.getElementById('attack-button');
         const abilityButton = document.getElementById('ability-button');
         const fleeButton = document.getElementById('flee-button');
+        const inventoryDiv = document.getElementById('inventory');
 
         // Referências do modal
         const gameModal = document.getElementById('game-modal');
@@ -403,27 +427,4 @@
                 const classButton = document.createElement('button');
                 classButton.textContent = gameData.classes[key].name;
                 classButton.className = 'pixel-button';
-                classButton.onclick = () => selectClass(key);
-                classOptionsDiv.appendChild(classButton);
-            }
-            classSelectionModal.style.display = 'block';
-        }
-
-        function selectClass(classKey) {
-            gameState.player = classKey;
-            gameState.gameStarted = true;
-            gameState.currentDungeon = gameData.dungeons[0]; // Começa na primeira dungeon
-            classSelectionModal.style.display = 'none';
-            startGame();
-        }
-
-        function startGame() {
-            startScreen.style.display = 'none';
-            gameScreen.style.display = 'flex';
-            updatePlayerStats();
-            logEvent(`Você começou sua aventura como ${gameData.classes[gameState.player].name}!`);
-        }
-
-        function updatePlayerStats() {
-            const playerClass = gameData.classes[gameState.player];
-            playerStatsDiv.innerHTML
+                classButton
