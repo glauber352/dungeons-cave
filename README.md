@@ -718,3 +718,65 @@
     </script>
 </body>
 </html>
+// Adicionar poções de cura ao gameData
+gameData.potions = [
+    { name: "Poção de Cura Menor", healAmount: 20 },
+    { name: "Poção de Cura", healAmount: 50 },
+    { name: "Poção de Cura Maior", healAmount: 100 }
+];
+// Adicionar armas e armaduras ao gameData
+gameData.items = {
+    weapons: [
+        { name: "Espada Curta", attack: 5 },
+        { name: "Espada Longa", attack: 10 },
+        { name: "Machado", attack: 8 }
+    ],
+    armors: [
+        { name: "Armadura de Couro", defense: 3 },
+        { name: "Armadura de Ferro", defense: 5 },
+        { name: "Armadura de Placas", defense: 8 }
+    ]
+};
+// Lógica de Exploração (atualizada)
+exploreButton.addEventListener('click', () => {
+    logEvent("Você explora a masmorra...");
+    // Simular encontro com inimigo ou itens
+    const encounters = [
+        { type: 'enemy', enemy: { name: "Goblin Fraco", hp: 30, attack: 8, defense: 2, gold: 10 } },
+        { type: 'item', item: gameData.potions[Math.floor(Math.random() * gameData.potions.length)] },
+        { type: 'item', item: gameData.items.weapons[Math.floor(Math.random() * gameData.items.weapons.length)] }
+    ];
+    const encounter = encounters[Math.floor(Math.random() * encounters.length)];
+
+    if (encounter.type === 'enemy') {
+        gameData.currentEnemy = { ...encounter.enemy };
+        logEvent(`Um ${gameData.currentEnemy.name} aparece!`, 'combat');
+    } else {
+        const item = encounter.item;
+        gameData.player.inventory.push(item);
+        logEvent(`Você encontrou uma ${item.name}!`, 'success');
+    }
+
+    updateEnemyUI();
+    updateInventoryUI();
+    updateActionButtons();
+});
+<button id="use-potion-button" class="pixel-button" disabled>Usar Poção</button>
+// Lógica para usar poções
+document.getElementById('use-potion-button').addEventListener('click', () => {
+    if (gameData.player.inventory.length === 0) {
+        logEvent("Você não tem poções para usar!", 'important');
+        return;
+    }
+
+    const potion = gameData.player.inventory.find(item => item.healAmount);
+    if (potion) {
+        gameData.player.hp = Math.min(gameData.player.maxHp, gameData.player.hp + potion.healAmount);
+        logEvent(`Você usou uma ${potion.name} e curou ${potion.healAmount} HP!`, 'success');
+        gameData.player.inventory = gameData.player.inventory.filter(item => item !== potion); // Remove a poção usada
+        updatePlayerStatsUI();
+        updateInventoryUI();
+    } else {
+        logEvent("Você não tem poções para usar!", 'important');
+    }
+});
