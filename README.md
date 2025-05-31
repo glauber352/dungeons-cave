@@ -466,4 +466,453 @@
             if (type === 'heal') p.classList.add('text-green-400'); // Healing
             if (type === 'success') p.classList.add('text-green-400'); // General success
             if (type === 'info') p.classList.add('text-blue-300'); // Neutral info
-            if (type ==
+            if (type === 'loot') p.classList.add('text-purple-400'); // Loot messages
+
+            // For Tailwind JIT, ensure these classes are recognized if not used elsewhere
+            // text-yellow-400 text-red-400 text-green-400 text-orange-400 text-blue-300 text-purple-400 font-bold
+            
+            gameLogDiv.appendChild(p);
+            gameLogDiv.scrollTop = gameLogDiv.scrollHeight; // Auto-scroll para a última mensagem
+        }
+
+        // Mostra o modal genérico
+        function showModal(message, onOkCallback) {
+            modalMessage.textContent = message;
+            gameModal.style.display = 'block';
+            
+            // Remove previous listener to avoid multiple triggers if modal is reused
+            const newOkBtn = modalOkBtn.cloneNode(true);
+            modalOkBtn.parentNode.replaceChild(newOkBtn, modalOkBtn);
+            
+            // Assign new listener
+            newOkBtn.addEventListener('click', () => {
+                gameModal.style.display = 'none';
+                if (typeof onOkCallback === 'function') {
+                    onOkCallback();
+                }
+            });
+        }
+        
+        // Abrir modal de seleção de classe
+        startGameBtn.addEventListener('click', () => {
+            classSelectionModal.style.display = 'block';
+            confirmClassBtn.disabled = true;
+            gameData.selectedClassKey = null;
+            classOptionsDiv.innerHTML = ''; // Limpa opções anteriores
+
+            // Criar botões para cada classe
+            for (const key in gameData.classes) {
+                if (gameData.classes.hasOwnProperty(key)) {
+                    const classInfo = gameData.classes[key];
+                    const btn = document.createElement('button');
+                    btn.className = 'pixel-button'; 
+                    btn.textContent = classInfo.name;
+                    btn.title = classInfo.description; 
+                    btn.dataset.classKey = key; 
+                    btn.onclick = () => selectClass(key, btn);
+                    classOptionsDiv.appendChild(btn);
+                }
+            }
+        });
+
+        // Função para selecionar uma classe
+        function selectClass(classKey, button) {
+            gameData.selectedClassKey = classKey;
+            
+            Array.from(classOptionsDiv.children).forEach(btn => {
+                btn.style.borderColor = '#c0392b'; 
+                btn.style.backgroundColor = '#e74c3c'; 
+                btn.classList.remove('border-yellow-400', 'bg-yellow-600'); // Using Tailwind for consistency
+            });
+            
+            button.style.borderColor = '#f1c40f'; 
+            button.style.backgroundColor = '#f39c12';
+            // Alternatively, use Tailwind classes for selection:
+            // button.classList.add('border-yellow-400', 'bg-yellow-600');
+
+            confirmClassBtn.disabled = false; // Habilita o botão de confirmação
+        }
+
+        // Função para atualizar a UI de stats do jogador
+        function updatePlayerStatsUI() {
+            if (!gameData.selectedClass) return; // Sai se nenhuma classe foi selecionada ainda
+
+            playerStatsDiv.innerHTML = ''; // Limpa stats anteriores
+
+            const stats = [
+                `Classe: ${gameData.player.name}`,
+                `HP: ${gameData.player.hp} / ${gameData.player.maxHp}`,
+                `Ataque: ${gameData.player.attack}`,
+                `Defesa: ${gameData.player.defense}`,
+                `Habilidade: ${gameData.player.abilityName}`
+            ];
+
+            stats.forEach(statText => {
+                const span = document.createElement('span');
+                span.textContent = statText;
+                playerStatsDiv.appendChild(span);
+            });
+        }
+        
+        // Função para atualizar a UI da mochila
+        function updateInventoryUI() {
+            inventoryDiv.innerHTML = ''; // Limpa a mochila
+            if (gameData.player.inventory.length === 0) {
+                const p = document.createElement('p');
+                p.className = 'empty-inventory-message'; // Use specific class
+                p.textContent = 'Sua mochila está vazia.';
+                inventoryDiv.appendChild(p);
+            } else {
+                gameData.player.inventory.forEach((item, index) => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'inventory-item';
+                    itemDiv.textContent = `${item.name} (${item.quantity > 1 ? 'x' + item.quantity : '1'})`;
+                    
+                    // Add use button for potions or other usable items
+                    const itemDetails = gameData.items[item.name];
+                    if (itemDetails && itemDetails.type === 'potion') {
+                        const useButton = document.createElement('button');
+                        useButton.textContent = 'Usar';
+                        useButton.className = 'pixel-button text-xs py-1 px-2 ml-2'; // Smaller button
+                        useButton.style.fontSize = '0.6rem'; // Even smaller font for button
+                        useButton.onclick = () => useItem(index);
+                        itemDiv.appendChild(useButton);
+                    }
+                    inventoryDiv.appendChild(itemDiv);
+                });
+            }
+        }
+
+
+        // Confirmar seleção de classe e iniciar o jogo
+        confirmClassBtn.addEventListener('click', () => {
+            if (!gameData.selectedClassKey) {
+                showModal("Por favor, selecione uma classe.");
+                return;
+            }
+
+            gameData.selectedClass = gameData.classes[gameData.selectedClassKey];
+            const classInfo = gameData.selectedClass;
+
+            // Inicializa o jogador
+            gameData.player.name = classInfo.name;
+            gameData.player.hp = classInfo.baseHp;
+            gameData.player.maxHp = classInfo.baseHp;
+            gameData.player.attack = classInfo.baseAttack;
+            gameData.player.defense = classInfo.baseDefense;
+            gameData.player.abilityName = classInfo.ability;
+            gameData.player.inventory = []; // Começa com mochila vazia
+            gameData.player.specialAbilityUsedThisCombat = false;
+
+            updatePlayerStatsUI();
+            updateInventoryUI();
+            updateEnemyUI(); // Ensure enemy UI is reset
+
+            // Transição de telas
+            classSelectionModal.style.display = 'none';
+            startScreen.style.display = 'none';
+            gameScreen.style.display = 'flex'; // Usa flex como definido no CSS
+
+            logEvent(`Você escolheu a classe: ${classInfo.name}. Que sua jornada seja épica!`, 'important');
+
+            // Configura estado inicial dos botões de ação
+            exploreButton.disabled = false;
+            attackButton.disabled = true;
+            abilityButton.disabled = true;
+            fleeButton.disabled = true;
+        });
+        
+        // --- Lógica de Combate e Exploração (Básica) ---
+
+        function updateEnemyUI() {
+            if (gameData.currentEnemy) {
+                enemyNameSpan.textContent = gameData.currentEnemy.name;
+                enemyHpSpan.textContent = `HP: ${gameData.currentEnemy.hp}`;
+                attackButton.disabled = false;
+                abilityButton.disabled = gameData.player.specialAbilityUsedThisCombat;
+                fleeButton.disabled = false;
+                exploreButton.disabled = true;
+            } else {
+                enemyNameSpan.textContent = "Nenhum Inimigo";
+                enemyHpSpan.textContent = "HP: --";
+                attackButton.disabled = true;
+                abilityButton.disabled = true;
+                fleeButton.disabled = true;
+                exploreButton.disabled = false;
+            }
+        }
+
+        function spawnRandomEnemy() {
+            if (gameData.currentEnemy) return; // Don't spawn if one is already active
+
+            const enemyKeys = Object.keys(gameData.enemies);
+            const randomKey = enemyKeys[Math.floor(Math.random() * enemyKeys.length)];
+            const enemyTemplate = gameData.enemies[randomKey];
+            
+            // Create a copy of the enemy template for the current encounter
+            gameData.currentEnemy = { ...enemyTemplate }; 
+            // Reset HP to maxHP for the new spawn
+            gameData.currentEnemy.hp = enemyTemplate.maxHp;
+
+
+            logEvent(`Um ${gameData.currentEnemy.name} selvagem aparece!`, 'important');
+            gameData.player.specialAbilityUsedThisCombat = false; // Reset ability use for new combat
+            updateEnemyUI();
+        }
+
+        exploreButton.addEventListener('click', () => {
+            logEvent("Você explora os corredores sombrios da caverna...", 'info');
+            // Chance to find an enemy, or an item, or nothing
+            const roll = Math.random();
+            if (roll < 0.6) { // 60% chance to find an enemy
+                spawnRandomEnemy();
+            } else if (roll < 0.8) { // 20% chance to find a random item (simple for now)
+                const itemsKeys = Object.keys(gameData.items);
+                const randomItemKey = itemsKeys[Math.floor(Math.random() * itemsKeys.length)];
+                if (gameData.items[randomItemKey].type !== 'junk') { // Avoid giving junk directly for now
+                     addItemToInventory(randomItemKey, 1);
+                     logEvent(`Você encontrou ${randomItemKey}!`, 'loot');
+                } else {
+                    logEvent("Você vasculha, mas não encontra nada de valor.", 'info');
+                }
+            } else { // 20% chance to find nothing
+                logEvent("A área parece vazia por enquanto.", 'info');
+            }
+        });
+
+        attackButton.addEventListener('click', handlePlayerAttack);
+        abilityButton.addEventListener('click', handlePlayerAbility);
+        fleeButton.addEventListener('click', handleFleeAttempt);
+
+        function handlePlayerAttack() {
+            if (!gameData.currentEnemy || gameData.player.hp <= 0) return;
+
+            // Player attacks enemy
+            let playerDamage = Math.max(1, gameData.player.attack - gameData.currentEnemy.defense);
+            // Add some randomness to damage
+            playerDamage = Math.floor(playerDamage * (Math.random() * 0.4 + 0.8)); // 80% to 120% of base damage
+            
+            gameData.currentEnemy.hp -= playerDamage;
+            logEvent(`Você ataca ${gameData.currentEnemy.name} causando ${playerDamage} de dano.`, 'enemy_damage');
+
+            if (gameData.currentEnemy.hp <= 0) {
+                handleVictory();
+                return;
+            }
+            updateEnemyUI();
+            // Enemy attacks player (after a short delay for readability)
+            setTimeout(handleEnemyAttack, 700);
+        }
+        
+        function handlePlayerAbility() {
+            if (!gameData.currentEnemy || gameData.player.hp <= 0 || gameData.player.specialAbilityUsedThisCombat) return;
+
+            logEvent(`Você usa ${gameData.player.abilityName}!`, 'important');
+            gameData.player.specialAbilityUsedThisCombat = true;
+            abilityButton.disabled = true; // Disable after use in this combat
+
+            // Basic ability effects (can be expanded greatly)
+            let abilitySuccessful = true;
+            switch (gameData.selectedClassKey) {
+                case 'knight': // Escudo Imbatível: aumenta defesa temporariamente (efeito passivo no cálculo de dano inimigo por 1 turno)
+                    gameData.player.defense += 5;
+                    logEvent("Sua defesa aumenta temporariamente!", 'success');
+                    setTimeout(() => { gameData.player.defense -= 5; logEvent("O efeito do Escudo Imbatível passou.", "info"); updatePlayerStatsUI(); }, 10000); // Lasts for 10s (approx 1-2 turns)
+                    break;
+                case 'rogue': // Ataque Furtivo: Causa dano extra
+                    let rogueDamage = Math.max(1, Math.floor(gameData.player.attack * 1.5) - gameData.currentEnemy.defense);
+                    rogueDamage = Math.floor(rogueDamage * (Math.random() * 0.4 + 0.8));
+                    gameData.currentEnemy.hp -= rogueDamage;
+                    logEvent(`Seu ataque furtivo causa ${rogueDamage} de dano extra!`, 'enemy_damage');
+                    break;
+                case 'mage': // Tempestade Arcana: Dano em área (aqui, dano alto no inimigo atual)
+                    let mageDamage = Math.max(1, Math.floor(gameData.player.attack * 1.2 + 10) - gameData.currentEnemy.defense); // Higher base, less reliant on weapon
+                    mageDamage = Math.floor(mageDamage * (Math.random() * 0.4 + 0.8));
+                    gameData.currentEnemy.hp -= mageDamage;
+                    logEvent(`Uma tempestade arcana atinge ${gameData.currentEnemy.name} causando ${mageDamage} de dano!`, 'enemy_damage');
+                    break;
+                case 'cleric': // Bênção Divina: Cura o jogador
+                    const healAmount = Math.floor(gameData.player.maxHp * 0.3); // Cura 30% do Max HP
+                    gameData.player.hp = Math.min(gameData.player.maxHp, gameData.player.hp + healAmount);
+                    logEvent(`Você se cura em ${healAmount} HP!`, 'heal');
+                    updatePlayerStatsUI();
+                    break;
+                case 'barbarian': // Fúria Insana: Aumenta ataque, diminui defesa
+                     gameData.player.attack += 7;
+                     gameData.player.defense = Math.max(0, gameData.player.defense -3);
+                     logEvent("Você entra em fúria! Ataque aumentado, defesa reduzida.", 'important');
+                     updatePlayerStatsUI();
+                     setTimeout(() => {
+                        gameData.player.attack -= 7;
+                        gameData.player.defense +=3; // Restore original defense reduction
+                        logEvent("Sua fúria se acalma.", "info");
+                        updatePlayerStatsUI();
+                     }, 10000);
+                    break;
+                case 'hunter': // Tiro Certeiro: Chance alta de acerto crítico (dano dobrado)
+                    let hunterDamage = gameData.player.attack;
+                    if (Math.random() < 0.5) { // 50% chance of critical
+                        hunterDamage *= 2;
+                        logEvent("Tiro Crítico!", 'success');
+                    }
+                    hunterDamage = Math.max(1, hunterDamage - gameData.currentEnemy.defense);
+                    hunterDamage = Math.floor(hunterDamage * (Math.random() * 0.4 + 0.8));
+                    gameData.currentEnemy.hp -= hunterDamage;
+                    logEvent(`Seu tiro certeiro causa ${hunterDamage} de dano!`, 'enemy_damage');
+                    break;
+                default:
+                    logEvent("Sua habilidade não teve efeito aparente...", "info");
+                    abilitySuccessful = false; // If no specific ability, don't proceed to enemy attack directly
+                    break;
+            }
+            
+            if (gameData.currentEnemy.hp <= 0) {
+                handleVictory();
+                return;
+            }
+            updateEnemyUI();
+
+            if (abilitySuccessful && gameData.currentEnemy && gameData.currentEnemy.hp > 0) {
+                 // Enemy attacks player (after a short delay for readability)
+                setTimeout(handleEnemyAttack, 700);
+            }
+        }
+
+        function handleEnemyAttack() {
+            if (!gameData.currentEnemy || gameData.currentEnemy.hp <= 0 || gameData.player.hp <= 0) return;
+
+            let enemyDamage = Math.max(1, gameData.currentEnemy.attack - gameData.player.defense);
+            enemyDamage = Math.floor(enemyDamage * (Math.random() * 0.4 + 0.8)); // 80% to 120%
+            
+            gameData.player.hp -= enemyDamage;
+            logEvent(`${gameData.currentEnemy.name} ataca você causando ${enemyDamage} de dano.`, 'player_damage');
+            updatePlayerStatsUI();
+
+            if (gameData.player.hp <= 0) {
+                handleDefeat();
+            }
+        }
+        
+        function handleFleeAttempt() {
+            if (!gameData.currentEnemy || gameData.player.hp <= 0) return;
+
+            logEvent("Você tenta fugir...", 'info');
+            if (Math.random() < 0.5) { // 50% chance de sucesso
+                logEvent("Você conseguiu escapar!", 'success');
+                gameData.currentEnemy = null;
+                updateEnemyUI();
+            } else {
+                logEvent("Sua tentativa de fuga falhou!", 'player_damage');
+                setTimeout(handleEnemyAttack, 700); // Inimigo ataca se a fuga falhar
+            }
+        }
+
+        function handleVictory() {
+            logEvent(`Você derrotou ${gameData.currentEnemy.name}!`, 'success');
+            const goldFound = gameData.currentEnemy.gold || 0;
+            if (goldFound > 0) {
+                // For now, just log gold. Later, add to player inventory/stats.
+                logEvent(`Você encontrou ${goldFound} moedas de ouro!`, 'loot');
+            }
+
+            // Check for loot
+            if (gameData.currentEnemy.lootTable) {
+                gameData.currentEnemy.lootTable.forEach(loot => {
+                    if (Math.random() < loot.chance) {
+                        addItemToInventory(loot.item, 1);
+                        logEvent(`O inimigo derrubou: ${loot.item}!`, 'loot');
+                    }
+                });
+            }
+
+            gameData.currentEnemy = null;
+            updateEnemyUI();
+            // Potentially show a victory modal or offer next actions
+            showModal("Você venceu o combate!", () => {
+                exploreButton.disabled = false; // Re-enable exploration
+            });
+        }
+
+        function handleDefeat() {
+            logEvent("Você foi derrotado... A escuridão te consome.", 'important');
+            gameData.player.hp = 0; // Ensure HP is 0
+            updatePlayerStatsUI();
+            // Disable all actions
+            exploreButton.disabled = true;
+            attackButton.disabled = true;
+            abilityButton.disabled = true;
+            fleeButton.disabled = true;
+            
+            showModal("FIM DE JOGO! Você foi derrotado. Tente novamente.", () => {
+                // Reset game or redirect to start screen
+                // For simplicity, just refresh the page to restart
+                // Or, more gracefully:
+                startScreen.style.display = 'flex';
+                gameScreen.style.display = 'none';
+                classSelectionModal.style.display = 'none';
+                gameData.currentEnemy = null;
+                gameData.player.inventory = [];
+                logEvent("--- Novo Jogo ---", "important");
+                // Clear log or keep it, depends on preference
+                // gameLogDiv.innerHTML = '<p>Bem-vindo à Dungeons Cave! Escolha uma classe para começar.</p>';
+            });
+        }
+
+        function addItemToInventory(itemName, quantity) {
+            const itemDetails = gameData.items[itemName];
+            if (!itemDetails) {
+                console.error(`Item desconhecido: ${itemName}`);
+                return;
+            }
+
+            const existingItem = gameData.player.inventory.find(i => i.name === itemName);
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                gameData.player.inventory.push({ name: itemName, quantity: quantity });
+            }
+            updateInventoryUI();
+        }
+        
+        function useItem(itemIndexInInventory) {
+            const itemEntry = gameData.player.inventory[itemIndexInInventory];
+            if (!itemEntry) return;
+
+            const itemDetails = gameData.items[itemEntry.name];
+            if (!itemDetails) return;
+
+            if (itemDetails.type === 'potion' && itemDetails.effect === 'heal') {
+                if (gameData.player.hp >= gameData.player.maxHp) {
+                    logEvent("Sua vida já está cheia!", "info");
+                    return;
+                }
+                gameData.player.hp = Math.min(gameData.player.maxHp, gameData.player.hp + itemDetails.power);
+                logEvent(`Você usou ${itemEntry.name} e recuperou ${itemDetails.power} HP.`, 'heal');
+                updatePlayerStatsUI();
+                
+                itemEntry.quantity--;
+                if (itemEntry.quantity <= 0) {
+                    gameData.player.inventory.splice(itemIndexInInventory, 1);
+                }
+                updateInventoryUI();
+
+                // If in combat, enemy might take a turn
+                if (gameData.currentEnemy && gameData.currentEnemy.hp > 0) {
+                    logEvent("Usar um item te deixa vulnerável!", "info");
+                    setTimeout(handleEnemyAttack, 700);
+                }
+
+            } else {
+                logEvent(`Você não pode usar ${itemEntry.name} agora.`, "info");
+            }
+        }
+
+
+        // --- Inicialização ---
+        // Garante que a mochila e stats do inimigo estejam no estado inicial correto na UI.
+        updateInventoryUI();
+        updateEnemyUI();
+
+    </script>
+</body>
+</html>
