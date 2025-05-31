@@ -222,7 +222,7 @@
                 <div id="class-options" class="flex flex-col gap-2">
                     <!-- As opções de classe serão inseridas aqui -->
                 </div>
-                <button id="modal-class-ok-button" class="pixel-button">Confirmar Classe</button>
+                <button id="modal-class-ok-button" class="pixel-button" disabled>Confirmar Classe</button>
                 <h3 class="mt-4">Tabela de Classes e Armas</h3>
                 <table>
                     <thead>
@@ -360,4 +360,57 @@
                 mage: { name: "Mago", description: "Mestre dos elementos, dano mágico em área.", ability: "Tempestade Arcana", baseHp: 70, baseAttack: 30, baseDefense: 3 },
                 cleric: { name: "Clérigo", description: "Suporte, cura, buffs e dano sagrado.", ability: "Bênção Divina", baseHp: 90, baseAttack: 20, baseDefense: 7 },
                 barbarian: { name: "Bárbaro", description: "Selvagem, dano físico bruto, pouca defesa.", ability: "Fúria Insana", baseHp: 110, baseAttack: 28, baseDefense: 4 },
-                hunter
+                hunter: { name: "Patrulheiro", description: "Perito em combate à distância, usa arcos.", ability: "Tiro Certeiro", baseHp: 85, baseAttack: 22, baseDefense: 6 }
+            },
+            selectedClass: null
+        };
+
+        // Função para abrir o modal de seleção de classe
+        document.getElementById('start-game-button').addEventListener('click', () => {
+            document.getElementById('class-selection-modal').style.display = 'block';
+            const classOptions = document.getElementById('class-options');
+            classOptions.innerHTML = ''; // Limpa opções anteriores
+
+            // Cria botões para cada classe
+            for (const key in gameData.classes) {
+                const classInfo = gameData.classes[key];
+                const button = document.createElement('button');
+                button.className = 'pixel-button';
+                button.innerText = classInfo.name;
+                button.onclick = () => selectClass(key);
+                classOptions.appendChild(button);
+            }
+        });
+
+        // Função para selecionar a classe
+        function selectClass(classKey) {
+            gameData.selectedClass = gameData.classes[classKey];
+            document.getElementById('modal-message').innerText = `Você escolheu a classe: ${gameData.selectedClass.name}`;
+            document.getElementById('class-selection-modal').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'flex';
+            updatePlayerStats();
+        }
+
+        // Atualiza as estatísticas do jogador
+        function updatePlayerStats() {
+            const playerStatsDiv = document.getElementById('player-stats');
+            playerStatsDiv.innerHTML = `
+                <span>Classe: ${gameData.selectedClass.name}</span>
+                <span>HP: ${gameData.selectedClass.baseHp}</span>
+                <span>Ataque: ${gameData.selectedClass.baseAttack}</span>
+                <span>Defesa: ${gameData.selectedClass.baseDefense}</span>
+            `;
+        }
+
+        // Fechar o modal
+        document.getElementById('modal-class-ok-button').addEventListener('click', () => {
+            document.getElementById('class-selection-modal').style.display = 'none';
+        });
+
+        // Inicializa o jogo
+        document.getElementById('modal-ok-button').addEventListener('click', () => {
+            document.getElementById('game-modal').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
