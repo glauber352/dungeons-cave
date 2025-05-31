@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>DUNGEONS CAVE</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
     <style>
         /* Estilos personalizados para o jogo */
         body {
@@ -34,7 +34,9 @@
             position: relative; /* Para posicionar o modal */
         }
 
-        h1, h2, h3 {
+        h1,
+        h2,
+        h3 {
             color: #f1c40f; /* Cor de destaque para títulos */
             text-align: center;
             margin-bottom: 1rem;
@@ -122,7 +124,8 @@
             margin-top: 1rem;
         }
 
-        th, td {
+        th,
+        td {
             border: 1px solid #555;
             padding: 0.5rem;
             text-align: left;
@@ -153,7 +156,8 @@
             gap: 1rem;
         }
 
-        .player-stats, .enemy-info {
+        .player-stats,
+        .enemy-info {
             display: flex;
             flex-wrap: wrap;
             gap: 0.5rem 1.5rem; /* Espaçamento entre itens e linhas */
@@ -161,7 +165,8 @@
             font-size: 0.9rem;
         }
 
-        .player-stats span, .enemy-info span {
+        .player-stats span,
+        .enemy-info span {
             background-color: #1a242f;
             padding: 0.4rem 0.8rem;
             border-radius: 4px;
@@ -362,38 +367,78 @@
                 barbarian: { name: "Bárbaro", description: "Selvagem, dano físico bruto, pouca defesa.", ability: "Fúria Insana", baseHp: 110, baseAttack: 28, baseDefense: 4 },
                 hunter: { name: "Patrulheiro", description: "Perito em combate à distância, usa arcos.", ability: "Tiro Certeiro", baseHp: 85, baseAttack: 22, baseDefense: 6 }
             },
+            selectedClassKey: null,
             selectedClass: null
         };
 
-        // Função para abrir o modal de seleção de classe
-        document.getElementById('start-game-button').addEventListener('click', () => {
-            document.getElementById('class-selection-modal').style.display = 'block';
-            const classOptions = document.getElementById('class-options');
-            classOptions.innerHTML = ''; // Limpa opções anteriores
+        // Elementos do DOM
+        const startGameBtn = document.getElementById('start-game-button');
+        const classSelectionModal = document.getElementById('class-selection-modal');
+        const classOptionsDiv = document.getElementById('class-options');
+        const confirmClassBtn = document.getElementById('modal-class-ok-button');
+        const gameScreen = document.getElementById('game-screen');
+        const startScreen = document.getElementById('start-screen');
+        const playerStatsDiv = document.getElementById('player-stats');
+        const modalMessage = document.getElementById('modal-message');
+        const gameModal = document.getElementById('game-modal');
+        const modalOkBtn = document.getElementById('modal-ok-button');
 
-            // Cria botões para cada classe
+        // Abrir modal de seleção de classe
+        startGameBtn.addEventListener('click', () => {
+            classSelectionModal.style.display = 'block';
+            confirmClassBtn.disabled = true;
+            gameData.selectedClass = null;
+            gameData.selectedClassKey = null;
+            classOptionsDiv.innerHTML = '';
+
+            // Criar botões para cada classe
             for (const key in gameData.classes) {
                 const classInfo = gameData.classes[key];
-                const button = document.createElement('button');
-                button.className = 'pixel-button';
-                button.innerText = classInfo.name;
-                button.onclick = () => selectClass(key);
-                classOptions.appendChild(button);
+                const btn = document.createElement('button');
+                btn.className = 'pixel-button';
+                btn.textContent = classInfo.name;
+                btn.title = classInfo.description;
+                btn.onclick = () => {
+                    selectClass(key, btn);
+                };
+                classOptionsDiv.appendChild(btn);
             }
         });
 
-        // Função para selecionar a classe
-        function selectClass(classKey) {
+        // Função para selecionar uma classe
+        function selectClass(classKey, button) {
+            gameData.selectedClassKey = classKey;
             gameData.selectedClass = gameData.classes[classKey];
-            document.getElementById('modal-message').innerText = `Você escolheu a classe: ${gameData.selectedClass.name}`;
-            document.getElementById('class-selection-modal').style.display = 'none';
-            document.getElementById('game-screen').style.display = 'flex';
-            updatePlayerStats();
+
+            // Remove destaque de todos os botões
+            Array.from(classOptionsDiv.children).forEach(btn => {
+                btn.style.borderColor = '#c0392b';
+                btn.style.backgroundColor = '#e74c3c';
+            });
+            // Destaque o botão selecionado
+            button.style.borderColor = '#f1c40f';
+            button.style.backgroundColor = '#f39c12';
+
+            // Habilita o botão confirmar
+            confirmClassBtn.disabled = false;
         }
 
-        // Atualiza as estatísticas do jogador
+        // Confirmar seleção da classe e iniciar jogo
+        confirmClassBtn.addEventListener('click', () => {
+            if (gameData.selectedClass) {
+                classSelectionModal.style.display = 'none';
+                startScreen.style.display = 'none';
+                gameScreen.style.display = 'flex';
+
+                updatePlayerStats();
+
+                modalMessage.textContent = `Você escolheu a classe: ${gameData.selectedClass.name}`;
+                gameModal.style.display = 'block';
+            }
+        });
+
+        // Atualiza as estatísticas do jogador na tela
         function updatePlayerStats() {
-            const playerStatsDiv = document.getElementById('player-stats');
             playerStatsDiv.innerHTML = `
                 <span>Classe: ${gameData.selectedClass.name}</span>
                 <span>HP: ${gameData.selectedClass.baseHp}</span>
@@ -402,15 +447,11 @@
             `;
         }
 
-        // Fechar o modal
-        document.getElementById('modal-class-ok-button').addEventListener('click', () => {
-            document.getElementById('class-selection-modal').style.display = 'none';
-        });
-
-        // Inicializa o jogo
-        document.getElementById('modal-ok-button').addEventListener('click', () => {
-            document.getElementById('game-modal').style.display = 'none';
+        // Fechar modal de mensagem
+        modalOkBtn.addEventListener('click', () => {
+            gameModal.style.display = 'none';
         });
     </script>
 </body>
 </html>
+
