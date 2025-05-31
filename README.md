@@ -205,6 +205,91 @@
                     <!-- As opções de classe serão inseridas aqui -->
                 </div>
                 <button id="modal-class-ok-button" class="pixel-button">Confirmar Classe</button>
+                <h3 class="mt-4">Tabela de Classes e Armas</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Classe</th>
+                            <th>Armas Simples</th>
+                            <th>Armas Marciais</th>
+                            <th>Observações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Bárbaro</td>
+                            <td>✔️</td>
+                            <td>✔️</td>
+                            <td>Usa quase todas as armas</td>
+                        </tr>
+                        <tr>
+                            <td>Bardo</td>
+                            <td>✔️</td>
+                            <td>Poucas</td>
+                            <td>Espada curta, florete, rapieira e besta leve</td>
+                        </tr>
+                        <tr>
+                            <td>Clérigo</td>
+                            <td>✔️</td>
+                            <td>❌</td>
+                            <td>Focado em armas simples</td>
+                        </tr>
+                        <tr>
+                            <td>Druida</td>
+                            <td>✔️ (parcial)</td>
+                            <td>❌</td>
+                            <td>Só armas que não sejam de metal: cajado, clava, foice curta, azagaia, lança, dardo, machado de mão, funda</td>
+                        </tr>
+                        <tr>
+                            <td>Guerreiro</td>
+                            <td>✔️</td>
+                            <td>✔️</td>
+                            <td>Usa todas as armas</td>
+                        </tr>
+                        <tr>
+                            <td>Monge</td>
+                            <td>✔️ (parcial)</td>
+                            <td>❌</td>
+                            <td>Armas simples e armas de monge: bastão, espada curta, foice curta, etc.</td>
+                        </tr>
+                        <tr>
+                            <td>Paladino</td>
+                            <td>✔️</td>
+                            <td>✔️</td>
+                            <td>Usa todas as armas</td>
+                        </tr>
+                        <tr>
+                            <td>Patrulheiro</td>
+                            <td>✔️</td>
+                            <td>✔️</td>
+                            <td>Usa todas as armas</td>
+                        </tr>
+                        <tr>
+                            <td>Ladino</td>
+                            <td>✔️</td>
+                            <td>Poucas</td>
+                            <td>Espada curta, florete, rapieira e besta de mão</td>
+                        </tr>
+                        <tr>
+                            <td>Feiticeiro</td>
+                            <td>✔️ (muito básico)</td>
+                            <td>❌</td>
+                            <td>Adaga, bastão, funda, besta leve, dardo</td>
+                        </tr>
+                        <tr>
+                            <td>Bruxo</td>
+                            <td>✔️ (muito básico)</td>
+                            <td>❌</td>
+                            <td>Adaga, bastão, funda, besta leve, dardo</td>
+                        </tr>
+                        <tr>
+                            <td>Mago</td>
+                            <td>✔️ (muito básico)</td>
+                            <td>❌</td>
+                            <td>Adaga, bastão, funda, besta leve, dardo</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -341,73 +426,4 @@
 
         function updatePlayerStats() {
             const playerClass = gameData.classes[gameState.player];
-            playerStatsDiv.innerHTML = `
-                <span>${playerClass.name}</span>
-                <span>HP: ${playerClass.baseHp}</span>
-                <span>Itens: ${gameState.items.length}</span>
-            `;
-        }
-
-        exploreButton.addEventListener('click', () => {
-            if (!gameState.gameStarted) return;
-            const enemyType = getRandomEnemy();
-            startBattle(enemyType);
-        });
-
-        function getRandomEnemy() {
-            const enemies = gameState.currentDungeon.enemyTypes;
-            const randomEnemyKey = enemies[Math.floor(Math.random() * enemies.length)];
-            return gameData.enemies[randomEnemyKey];
-        }
-
-        function startBattle(enemy) {
-            gameState.currentEnemy = enemy;
-            enemyNameSpan.textContent = enemy.name;
-            enemyHpSpan.textContent = `HP: ${enemy.hp}`;
-            attackButton.disabled = false;
-            abilityButton.disabled = false;
-            fleeButton.disabled = false;
-            logEvent(`Um ${enemy.name} apareceu!`);
-        }
-
-        attackButton.addEventListener('click', () => {
-            if (!gameState.currentEnemy) return;
-            const playerClass = gameData.classes[gameState.player];
-            const damage = Math.max(0, playerClass.baseAttack - gameState.currentEnemy.attack);
-            gameState.currentEnemy.hp -= damage;
-            logEvent(`Você atacou ${gameState.currentEnemy.name} e causou ${damage} de dano!`);
-            if (gameState.currentEnemy.hp <= 0) {
-                logEvent(`${gameState.currentEnemy.name} foi derrotado!`);
-                enemyNameSpan.textContent = "Nenhum Inimigo";
-                enemyHpSpan.textContent = "HP: --";
-                attackButton.disabled = true;
-                abilityButton.disabled = true;
-                fleeButton.disabled = true;
-                collectItem(); // Coleta um item ao derrotar um inimigo
-            } else {
-                enemyAttack();
-            }
-        });
-
-        function enemyAttack() {
-            const playerClass = gameData.classes[gameState.player];
-            const damage = Math.max(0, gameState.currentEnemy.attack - playerClass.baseDefense);
-            logEvent(`${gameState.currentEnemy.name} atacou você e causou ${damage} de dano!`);
-        }
-
-        function logEvent(message) {
-            gameState.gameLog.push(message);
-            gameLogDiv.innerHTML += `<p>${message}</p>`;
-            gameLogDiv.scrollTop = gameLogDiv.scrollHeight; // Rolagem automática
-        }
-
-        function collectItem() {
-            const items = ["Poção de Vida", "Espada Antiga", "Escudo de Madeira"];
-            const randomItem = items[Math.floor(Math.random() * items.length)];
-            gameState.items.push(randomItem);
-            logEvent(`Você coletou um item: ${randomItem}`);
-            updatePlayerStats();
-        }
-    </script>
-</body>
-</html>
+            playerStatsDiv.innerHTML
