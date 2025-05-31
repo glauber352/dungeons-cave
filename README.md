@@ -366,65 +366,16 @@
                 goblin: { name: "Goblin", hp: 30, attack: 5 },
                 giantBat: { name: "Morcego Gigante", hp: 25, attack: 6 },
                 venomousSpider: { name: "Aranha Venenosa", hp: 35, attack: 7 },
-                boss: { name: "Gorak, O Devorador", hp: 100, attack: 15 } // Boss
+                boss: { name: "Gorak, O Devorador", hp: 100, attack: 15 }, // Boss padrão
+                ancientDragon: { name: "🐉 Dragão Ancião", hp: Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000, attack: Math.floor(Math.random() * (350 - 100 + 1)) + 100 },
+                lichKing: { name: "👑 Rei Lich", hp: Math.floor(Math.random() * (3000 - 800 + 1)) + 800, attack: Math.floor(Math.random() * (250 - 120 + 1)) + 120 },
+                infernoLord: { name: "🔥 Senhor do Inferno", hp: Math.floor(Math.random() * (6000 - 1500 + 1)) + 1500, attack: Math.floor(Math.random() * (400 - 150 + 1)) + 150 },
+                worldDevourer: { name: "🕷️ Devoradora de Mundos", hp: Math.floor(Math.random() * (8000 - 2000 + 1)) + 2000, attack: Math.floor(Math.random() * (500 - 200 + 1)) + 200 },
+                timeAvatar: { name: "⏳ Avatar do Tempo", hp: Math.floor(Math.random() * (4000 - 1200 + 1)) + 1200, attack: Math.floor(Math.random() * (350 - 150 + 1)) + 150 },
+                boneColossus: { name: "🦴 Colosso de Ossos", hp: Math.floor(Math.random() * (7000 - 1800 + 1)) + 1800, attack: Math.floor(Math.random() * (400 - 180 + 1)) + 180 },
+                elementalTitan: { name: "🌋 Titã Elemental", hp: Math.floor(Math.random() * (6000 - 1500 + 1)) + 1500, attack: Math.floor(Math.random() * (400 - 150 + 1)) + 150 },
+                bloodGod: { name: "🩸 Deus Sangrento", hp: Math.floor(Math.random() * (9000 - 2500 + 1)) + 2500, attack: Math.floor(Math.random() * (500 - 200 + 1)) + 200 },
+                voidEntity: { name: "🌑 Entidade do Vazio", hp: Infinity, attack: Math.floor(Math.random() * (600 - 250 + 1)) + 250 } // HP infinito
             },
             dungeons: [
-                { name: "Caverna Sombria", levels: "1-5", boss: "Gorak, O Devorador", enemyTypes: ["goblin", "giantBat", "venomousSpider"] },
-            ],
-        };
-
-        // Estado do jogo
-        const gameState = {
-            player: null,
-            currentDungeon: null,
-            currentEnemy: null,
-            gameStarted: false,
-            gameLog: [],
-            items: [], // Array para itens coletados
-        };
-
-        // Referências aos elementos HTML
-        const startScreen = document.getElementById('start-screen');
-        const gameScreen = document.getElementById('game-screen');
-        const startGameButton = document.getElementById('start-game-button');
-        const classSelectionModal = document.getElementById('class-selection-modal');
-        const classOptionsDiv = document.getElementById('class-options');
-        const playerStatsDiv = document.getElementById('player-stats');
-        const enemyInfoDiv = document.getElementById('enemy-info');
-        const enemyNameSpan = document.getElementById('enemy-name');
-        const enemyHpSpan = document.getElementById('enemy-hp');
-        const gameLogDiv = document.getElementById('game-log');
-        const exploreButton = document.getElementById('explore-button');
-        const attackButton = document.getElementById('attack-button');
-        const abilityButton = document.getElementById('ability-button');
-        const fleeButton = document.getElementById('flee-button');
-        const inventoryDiv = document.getElementById('inventory');
-
-        // Referências do modal
-        const gameModal = document.getElementById('game-modal');
-        const modalMessage = document.getElementById('modal-message');
-        const modalOkButton = document.getElementById('modal-ok-button');
-
-        // Função para exibir o modal
-        function showGameModal(message) {
-            modalMessage.textContent = message;
-            gameModal.style.display = 'block';
-        }
-
-        // Event listener para o botão OK do modal
-        modalOkButton.addEventListener('click', () => {
-            gameModal.style.display = 'none';
-        });
-
-        // Iniciar o jogo
-        startGameButton.addEventListener('click', () => {
-            showClassSelection();
-        });
-
-        function showClassSelection() {
-            classOptionsDiv.innerHTML = ''; // Limpa as opções anteriores
-            for (const key in gameData.classes) {
-                const classButton = document.createElement('button');
-                classButton.textContent = gameData.classes[key].name;
-                classButton.className = 'pixel-button';
-                classButton
+                { name: "Caverna Sombria", levels: "1-5", boss: "Gorak, O Devorador", enemy
