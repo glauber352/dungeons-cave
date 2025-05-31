@@ -916,3 +916,274 @@
     </script>
 </body>
 </html>
+class Monster:
+    def __init__(self, name, cr, ac, hp, hp_formula=None,
+                 movement=None, attack_summary=None, attacks=None,
+                 special_abilities=None, legendary_actions=None, mythic_actions=None,
+                 immunities=None, notes=None):
+        """
+        Representa uma criatura (monstro) com suas estatísticas e habilidades.
+
+        Atributos:
+            name (str): O nome do monstro.
+            cr (int): O Nível de Desafio (Challenge Rating).
+            ac (int): A Classe de Armadura.
+            hp (int): Os Pontos de Vida.
+            hp_formula (str, opcional): A fórmula dos dados para os Pontos de Vida (ex: "33d20 + 330").
+            movement (dict, opcional): Velocidades de movimento (ex: {"ground": "40 pés", "fly": "80 pés"}).
+            attack_summary (str, opcional): Um resumo dos ataques (ex: "5 ataques", "3 ataques + sopro").
+            attacks (list, opcional): Lista de dicionários, cada um representando um ataque padrão.
+                Cada dicionário pode conter:
+                - "name" (str): Nome do ataque (ex: "Mordida").
+                - "to_hit" (str): Bônus para acertar (ex: "+19").
+                - "damage" (str): Dano e tipo (ex: "36 (4d12 + 10) de dano perfurante").
+                - "notes" (str, opcional): Notas adicionais sobre o ataque.
+            special_abilities (list, opcional): Lista de dicionários para habilidades especiais,
+                baforadas, magias, etc.
+                Cada dicionário pode conter:
+                - "name" (str): Nome da habilidade (ex: "Sopro de Fogo").
+                - "description" (str): Descrição da habilidade.
+                - "recharge" (str, opcional): Condição de recarga (ex: "recarga 5-6").
+            legendary_actions (list, opcional): Lista de strings ou dicionários descrevendo ações lendárias.
+            mythic_actions (list, opcional): Lista de dicionários descrevendo ações míticas.
+            immunities (list, opcional): Lista de strings descrevendo imunidades.
+            notes (str, opcional): Notas gerais sobre o monstro.
+        """
+        self.name = name
+        self.cr = cr
+        self.ac = ac
+        self.hp = hp
+        self.hp_formula = hp_formula
+        self.movement = movement if movement else {}
+        self.attack_summary = attack_summary
+        self.attacks = attacks if attacks else []
+        self.special_abilities = special_abilities if special_abilities else []
+        self.legendary_actions = legendary_actions if legendary_actions else []
+        self.mythic_actions = mythic_actions if mythic_actions else []
+        self.immunities = immunities if immunities else []
+        self.notes = notes
+
+    def __repr__(self):
+        return f"Monster(name='{self.name}', cr={self.cr}, ac={self.ac}, hp={self.hp})"
+
+    def display_details(self):
+        """Retorna uma string formatada com todos os detalhes do monstro."""
+        details = [
+            f"Nome: {self.name}",
+            f"CR: {self.cr}",
+            f"CA: {self.ac}",
+            f"PV: {self.hp} ({self.hp_formula if self.hp_formula else 'N/A'})",
+            f"Movimento: {self.movement if self.movement else 'N/A'}",
+        ]
+        if self.attack_summary:
+            details.append(f"Resumo dos Ataques: {self.attack_summary}")
+        if self.attacks:
+            details.append("Ataques:")
+            for attack in self.attacks:
+                attack_str = f"  - {attack.get('name', 'Ataque')}:"
+                if 'to_hit' in attack:
+                    attack_str += f" {attack['to_hit']},"
+                attack_str += f" {attack.get('damage', 'N/A')}"
+                if 'notes' in attack:
+                    attack_str += f" ({attack['notes']})"
+                details.append(attack_str)
+        if self.special_abilities:
+            details.append("Habilidades Especiais/Ataques Especiais:")
+            for ability in self.special_abilities:
+                ability_str = f"  - {ability.get('name', 'Habilidade')}: {ability.get('description', '')}"
+                if 'recharge' in ability:
+                    ability_str += f" (Recarga: {ability['recharge']})"
+                details.append(ability_str)
+        if self.legendary_actions:
+            details.append("Ações Lendárias:")
+            for action in self.legendary_actions:
+                if isinstance(action, dict):
+                    details.append(f"  - {action.get('name', 'Ação')}: {action.get('description', '')}")
+                else:
+                    details.append(f"  - {action}")
+        if self.mythic_actions:
+            details.append("Ações Míticas:")
+            for action in self.mythic_actions:
+                details.append(f"  - {action.get('name', 'Ação')}: {action.get('description', '')}")
+        if self.immunities:
+            details.append(f"Imunidades: {', '.join(self.immunities)}")
+        if self.notes:
+            details.append(f"Notas: {self.notes}")
+        
+        return "\n".join(details)
+
+# Lista para armazenar todos os monstros
+monsters_list = []
+
+# 1. Dragão Vermelho Ancião (versão resumida em Português)
+dragao_vermelho_anciao_pt = Monster(
+    name="Dragão Vermelho Ancião",
+    cr=24,
+    ac=22,
+    hp=546,
+    attack_summary="Mordida, Garras, Cauda + Sopro de Fogo",
+    attacks=[ # Simplificado baseado na descrição
+        {"name": "Mordida", "damage": "Não especificado"},
+        {"name": "Garras", "damage": "Não especificado"},
+        {"name": "Cauda", "damage": "Não especificado"},
+    ],
+    special_abilities=[
+        {"name": "Sopro de Fogo", "description": "26d6 de dano!"}
+    ],
+    notes="extremamente poderoso"
+)
+monsters_list.append(dragao_vermelho_anciao_pt)
+
+# 2. Tarrasque (Português)
+tarrasque = Monster(
+    name="Tarrasque",
+    cr=30,
+    ac=25,
+    hp=676,
+    hp_formula="33d20 + 330",
+    movement={"ground": "40 pés"},
+    attack_summary="5 ataques (1 mordida, 2 garras, 1 chifre, 1 cauda)",
+    attacks=[
+        {"name": "Mordida", "to_hit": "+19", "damage": "36 (4d12 + 10) de dano perfurante"},
+        {"name": "Garras (x2)", "to_hit": "+19", "damage": "28 (4d8 + 10) de dano cortante"},
+        {"name": "Chifres", "to_hit": "+19", "damage": "32 (4d10 + 10) de dano perfurante"},
+        {"name": "Cauda", "to_hit": "+19", "damage": "24 (4d6 + 10) de dano contundente"},
+    ],
+    special_abilities=[
+        {"name": "Reflexão de Magia", "description": "Reflete magias de ataque de volta ao conjurador (salvaguarda falhada)."},
+        {"name": "Resistência Lendária (3x/dia)", "description": "Se falhar em uma salvaguarda, pode optar por passar."}
+    ],
+    immunities=["Magia", "fogo", "veneno", "psíquico", "controle mental"]
+)
+monsters_list.append(tarrasque)
+
+# 3. Ancient Red Dragon (Inglês, mais detalhado)
+ancient_red_dragon_en = Monster(
+    name="Ancient Red Dragon",
+    cr=24,
+    ac=22,
+    hp=546,
+    hp_formula="28d20 + 252",
+    movement={"ground": "40 pés", "fly": "80 pés"},
+    attack_summary="3 ataques + sopro",
+    attacks=[
+        {"name": "Mordida", "to_hit": "+17", "damage": "21 (2d10 + 10) perfurante + 14 (4d6) de fogo"},
+        {"name": "Garras", "to_hit": "+17", "damage": "17 (2d6 + 10) cortante"},
+    ],
+    special_abilities=[
+        {"name": "Sopro de Fogo", "description": "90 ft cone, 26d6 de dano de fogo (CD 24 Destreza para metade)", "recharge": "5–6"}
+    ],
+    legendary_actions=[
+        "Ataque com cauda", # Detalhes não especificados no input
+        "Ataque com asa",   # Detalhes não especificados no input
+        "Detecção (percepção)"
+    ]
+)
+monsters_list.append(ancient_red_dragon_en)
+
+# 4. Aspect of Tiamat
+aspect_of_tiamat = Monster(
+    name="Aspect of Tiamat",
+    cr=30,
+    ac=27,
+    hp=615,
+    hp_formula="30d20 + 300",
+    movement={"ground": "60 pés", "fly": "120 pés"},
+    attack_summary="5 cabeças, cada uma com baforada. Multiataque: Até 5 mordidas.",
+    # Mordidas não detalhadas, mas mencionadas em Ações Lendárias/Míticas
+    attacks=[
+        {"name": "Mordida (por cabeça)", "damage": "Não especificado, até 5 ataques"} # Detalhes de to_hit/damage ausentes
+    ],
+    special_abilities=[
+        {"name": "Baforada de Fogo (Cabeça Vermelha)", "description": "26d6 (cone de 90 ft)"},
+        {"name": "Baforada de Ácido (Cabeça Negra)", "description": "24d8 (linha)"}, # Assumindo tipos de dragão cromático padrão
+        {"name": "Baforada de Gelo (Cabeça Branca)", "description": "16d8 (cone)"},
+        {"name": "Baforada de Veneno (Cabeça Verde)", "description": "16d10 (cone)"},
+        {"name": "Baforada de Relâmpago (Cabeça Azul)", "description": "24d10 (linha)"},
+    ],
+    legendary_actions=[ # Combinado com míticas conforme texto
+        {"name": "Multiataque (Lendário)", "description": "Até 5 mordidas, uma por cabeça."}
+    ],
+    mythic_actions=[
+        {"name": "Ação Mítica", "description": "Pode usar após sofrer dano (3 vezes): recupera sopros ou invoca aliados."}
+    ],
+    immunities=["Todo tipo de dano elemental"]
+)
+monsters_list.append(aspect_of_tiamat)
+
+# 5. Kraken
+kraken = Monster(
+    name="Kraken",
+    cr=23,
+    ac=18,
+    hp=472,
+    hp_formula="27d20 + 189",
+    movement={"ground": "20 pés", "swim": "60 pés"},
+    attack_summary="3 tentáculos + raio de relâmpago",
+    attacks=[
+        {"name": "Tentáculo (x3)", "to_hit": "+18", "damage": "30 (3d6 + 10) contusão", "notes": "agarrar"}
+    ],
+    special_abilities=[
+        {"name": "Raio de Relâmpago", "description": "12d10 em linha de 90 pés (dano de relâmpago)"},
+        {"name": "Controle do Clima", "description": "Tempestades à vontade."},
+        {"name": "Choque Elétrico", "description": "dano passivo ao redor."}
+    ],
+    legendary_actions=[
+        "Ataques adicionais",
+        "Movimentação sem provocar ataque de oportunidade"
+    ]
+)
+monsters_list.append(kraken)
+
+# 6. Acererak, o Lich Supremo
+acererak = Monster(
+    name="Acererak, o Lich Supremo",
+    cr=23,
+    ac=21,
+    hp=285,
+    hp_formula="30d8 + 120",
+    movement={}, # Não especificado
+    attack_summary="Magias devastadoras",
+    attacks=[], # Magias listadas como habilidades especiais
+    special_abilities=[
+        {"name": "Finger of Death (dedo da morte)", "description": "7d8 + 30 de dano necrótico"},
+        {"name": "Power Word Kill", "description": "Mata se estiver com <100 PV"},
+        {"name": "Filactério", "description": "Só pode ser destruído se seu artefato for destruído."}
+    ],
+    legendary_actions=[
+        "Teleporte",
+        "Lançar magia",
+        "Drenar vida"
+    ],
+    immunities=["Necrótico", "enfeitiçamento", "paralisia", "medo", "sono"]
+)
+monsters_list.append(acererak)
+
+# 7. Balor
+balor = Monster(
+    name="Balor",
+    cr=20,
+    ac=19,
+    hp=262,
+    hp_formula="21d12 + 126",
+    movement={}, # Não especificado, mas geralmente têm voo
+    attacks=[
+        {"name": "Espada Flamejante", "to_hit": "+14", "damage": "21 (6d6 + 8) cortante + 13 (3d8) fogo"},
+        {"name": "Látego", "to_hit": "+14", "damage": "15 (2d6 + 8) cortante", "notes": "puxão"},
+    ],
+    special_abilities=[
+        {"name": "Aura Flamejante", "description": "dano de fogo constante a quem estiver perto"},
+        {"name": "Explosão ao Morrer", "description": "20d6 de fogo numa área de 30 ft."},
+        {"name": "Teleportar", "description": "120 pés sem ataque de oportunidade"}
+    ],
+    immunities=[] # Não especificado no input
+)
+monsters_list.append(balor)
+
+# Para verificar os monstros adicionados, você pode iterar pela lista e imprimir seus detalhes:
+if __name__ == '__main__':
+    for monster_obj in monsters_list:
+        print("------------------------------------------")
+        print(monster_obj.display_details())
+    print("------------------------------------------")
+    print(f"\nTotal de monstros adicionados: {len(monsters_list)}")
