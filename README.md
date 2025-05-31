@@ -1187,3 +1187,65 @@ if __name__ == '__main__':
         print(monster_obj.display_details())
     print("------------------------------------------")
     print(f"\nTotal de monstros adicionados: {len(monsters_list)}")
+if __name__ == '__main__':
+    print("------------------------------------------")
+    for monster_obj in monsters_list:
+        print(monster_obj.display_details())
+    print("------------------------------------------")
+    print(f"\nTotal de monstros adicionados: {len(monsters_list)}")
+# 1. Definição da Classe Monster
+# Esta classe serve como um "molde" para criar cada um dos seus monstros.
+class Monster:
+    def __init__(self, name, level, element, location):
+        """
+        Inicializa um novo objeto Monstro.
+
+        Args:
+            name (str): O nome do monstro.
+            level (int): O nível de poder do monstro.
+            element (str): O elemento ao qual o monstro pertence (e.g., Fogo, Água).
+            location (str): O local especial onde o monstro reside.
+        """
+        self.name = name
+        self.level = level
+        self.element = element
+        self.location = location # Novo atributo adicionado para a localização
+
+    def display_details(self):
+        """
+        Retorna uma string formatada com todos os detalhes do monstro.
+        Este é o método que será chamado para exibir as informações de cada monstro.
+        """
+        return f"Nome: {self.name} | Nível: {self.level} | Elemento: {self.element} | Local: {self.location}"
+
+# 2. Criação da lista de monstros (monsters_list)
+# Aqui, criamos instâncias da classe Monster, cada uma com seus próprios detalhes
+# e seus respectivos locais especiais.
+monsters_list = [
+    Monster("Goblin Zangado", 15, "Terra", "Cavernas Murmurantes"),
+    Monster("Sereia Encantada", 30, "Água", "Lago Cristalino da Aurora"),
+    Monster("Gárgula de Pedra", 45, "Pedra", "Ruínas Antigas do Castelo"),
+    Monster("Elemental de Fogo", 60, "Fogo", "Vulcão Adormecido de Ignis"),
+    Monster("Lobo Gélido", 20, "Gelo", "Picos Congelados da Névoa"),
+    Monster("Guardião da Floresta", 50, "Natureza", "Coração da Floresta Élfica")
+]
+
+# 3. Bloco de execução principal do código
+# O código dentro deste 'if' só é executado quando você roda o arquivo diretamente.
+if __name__ == '__main__':
+    print("------------------------------------------")
+
+    # Verifica se a lista de monstros está vazia.
+    # Isso evita erros e fornece uma mensagem amigável se não houver monstros.
+    if not monsters_list:
+        print("Nenhum monstro adicionado ainda. A lista está vazia.")
+    else:
+        # Itera sobre cada monstro na lista e exibe seus detalhes.
+        for monster_obj in monsters_list:
+            print(monster_obj.display_details())
+
+    print("------------------------------------------")
+
+    # Imprime o total de monstros na lista, com uma quebra de linha para melhor visualização.
+    print(f"\nTotal de monstros adicionados: {len(monsters_list)}")
+
