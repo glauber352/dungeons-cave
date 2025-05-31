@@ -360,22 +360,4 @@
                 mage: { name: "Mago", description: "Mestre dos elementos, dano mágico em área.", ability: "Tempestade Arcana", baseHp: 70, baseAttack: 30, baseDefense: 3 },
                 cleric: { name: "Clérigo", description: "Suporte, cura, buffs e dano sagrado.", ability: "Bênção Divina", baseHp: 90, baseAttack: 20, baseDefense: 7 },
                 barbarian: { name: "Bárbaro", description: "Selvagem, dano físico bruto, pouca defesa.", ability: "Fúria Insana", baseHp: 110, baseAttack: 28, baseDefense: 4 },
-                hunter: { name: "Caçador", description: "Longo alcance, armadilhas e animais de suporte.", ability: "Falcão Espreitador", baseHp: 85, baseAttack: 22, baseDefense: 6 }
-            },
-            enemies: {
-                goblin: { name: "Goblin", hp: 30, attack: 5 },
-                giantBat: { name: "Morcego Gigante", hp: 25, attack: 6 },
-                venomousSpider: { name: "Aranha Venenosa", hp: 35, attack: 7 },
-                boss: { name: "Gorak, O Devorador", hp: 100, attack: 15 }, // Boss padrão
-                ancientDragon: { name: "🐉 Dragão Ancião", hp: Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000, attack: Math.floor(Math.random() * (350 - 100 + 1)) + 100 },
-                lichKing: { name: "👑 Rei Lich", hp: Math.floor(Math.random() * (3000 - 800 + 1)) + 800, attack: Math.floor(Math.random() * (250 - 120 + 1)) + 120 },
-                infernoLord: { name: "🔥 Senhor do Inferno", hp: Math.floor(Math.random() * (6000 - 1500 + 1)) + 1500, attack: Math.floor(Math.random() * (400 - 150 + 1)) + 150 },
-                worldDevourer: { name: "🕷️ Devoradora de Mundos", hp: Math.floor(Math.random() * (8000 - 2000 + 1)) + 2000, attack: Math.floor(Math.random() * (500 - 200 + 1)) + 200 },
-                timeAvatar: { name: "⏳ Avatar do Tempo", hp: Math.floor(Math.random() * (4000 - 1200 + 1)) + 1200, attack: Math.floor(Math.random() * (350 - 150 + 1)) + 150 },
-                boneColossus: { name: "🦴 Colosso de Ossos", hp: Math.floor(Math.random() * (7000 - 1800 + 1)) + 1800, attack: Math.floor(Math.random() * (400 - 180 + 1)) + 180 },
-                elementalTitan: { name: "🌋 Titã Elemental", hp: Math.floor(Math.random() * (6000 - 1500 + 1)) + 1500, attack: Math.floor(Math.random() * (400 - 150 + 1)) + 150 },
-                bloodGod: { name: "🩸 Deus Sangrento", hp: Math.floor(Math.random() * (9000 - 2500 + 1)) + 2500, attack: Math.floor(Math.random() * (500 - 200 + 1)) + 200 },
-                voidEntity: { name: "🌑 Entidade do Vazio", hp: Infinity, attack: Math.floor(Math.random() * (600 - 250 + 1)) + 250 } // HP infinito
-            },
-            dungeons: [
-                { name: "Caverna Sombria", levels: "1-5", boss: "Gorak, O Devorador", enemy
+                hunter
