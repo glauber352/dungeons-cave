@@ -347,10 +347,10 @@
         <div id="start-screen">
             <h1>DUNGEONS CAVE</h1>
             <p class="text-center italic mb-4">"Aventure-se nas profundezas... se tiver coragem."</p>
-            <button id="start-game-button" class="pixel-button mt-6">Iniciar Jogo</button>
+            <button id="start-game-button" class="pixel-button mt-6">Escolher Classe</button>
         </div>
 
-        <!-- MODAL DE SELEÇÃO DE CLASSE (Agora não será exibido, mas o HTML permanece) -->
+        <!-- MODAL DE SELEÇÃO DE CLASSE (Agora será exibido novamente) -->
         <div id="class-selection-modal" class="modal">
             <!-- Conteúdo é gerado via JS -->
         </div>
@@ -703,18 +703,16 @@
         // --- Funções de Jogo ---
 
         /**
-         * Inicia o jogo, selecionando uma classe padrão automaticamente.
-         * A tela de seleção de classe é pulada.
+         * Inicia o jogo, mostrando a tela de seleção de classe.
          */
         function startGame() {
             startScreen.style.display = 'none';
-            // Seleciona a classe "knight" (Cavaleiro) automaticamente
-            selectClass('knight'); 
+            classSelectionModal.style.display = 'block';
+            renderClassSelection(); // Chama a função para renderizar as opções de classe
         }
 
         /**
          * Renderiza as opções de seleção de classe no modal.
-         * (Esta função não será mais chamada com a seleção automática, mas é mantida por completude).
          */
         function renderClassSelection() {
             classSelectionModal.innerHTML = `
