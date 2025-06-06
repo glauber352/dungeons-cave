@@ -9,76 +9,68 @@
     <style>
         /* Estilos personalizados para o jogo */
         body {
-            font-family: 'Press Start 2P', cursive; /* Aplica a fonte pixelada */
-            background-color: #2c3e50; /* Cor de fundo escura */
-            color: #ecf0f1; /* Cor do texto principal */
+            font-family: 'Press Start 2P', cursive;
+            background-color: #2c3e50;
+            color: #ecf0f1;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh; /* Garante que o body ocupe a altura total da viewport */
+            min-height: 100vh;
             padding: 1rem;
-            box-sizing: border-box; /* Inclui padding e borda no cálculo da largura/altura */
-            margin: 0; /* Reseta a margem padrão do body */
+            box-sizing: border-box;
+            margin: 0;
         }
 
         .game-container {
-            background-color: #34495e; /* Cor de fundo do contêiner principal */
-            border: 4px solid #1a242f; /* Borda grossa para visual de jogo */
-            border-radius: 8px; /* Cantos levemente arredondados */
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Sombra para profundidade */
+            background-color: #34495e;
+            border: 4px solid #1a242f;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
             padding: 1.5rem;
             max-width: 900px;
             width: 100%;
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
-            position: relative; /* Essencial para posicionar o modal */
+            position: relative;
         }
 
-        h1,
-        h2,
-        h3 {
-            color: #f1c40f; /* Cor de destaque para títulos */
+        h1, h2, h3 {
+            color: #f1c40f;
             text-align: center;
             margin-bottom: 1rem;
-            text-shadow: 2px 2px #000; /* Sombra de texto para efeito pixelado */
+            text-shadow: 2px 2px #000;
         }
 
         .pixel-button {
-            background-color: #e74c3c; /* Cor de botão primária */
+            background-color: #e74c3c;
             color: white;
             padding: 0.75rem 1.5rem;
-            border: 3px solid #c0392b; /* Borda para efeito 3D */
+            border: 3px solid #c0392b;
             border-radius: 5px;
             cursor: pointer;
             font-family: 'Press Start 2P', cursive;
             font-size: 0.9rem;
-            transition: background-color 0.1s, transform 0.1s; /* Transição suave */
-            box-shadow: 3px 3px #a52a22; /* Sombra para efeito de profundidade */
+            transition: background-color 0.1s, transform 0.1s;
+            box-shadow: 3px 3px #a52a22;
             display: inline-block;
-            width: auto;
             text-align: center;
-            image-rendering: pixelated; /* Garante que fontes pixel art renderizem nitidamente */
+            image-rendering: pixelated;
         }
 
         .pixel-button:hover {
             background-color: #c0392b;
-            transform: translateY(1px); /* Efeito de "levantar" no hover */
+            transform: translateY(1px);
             box-shadow: 2px 2px #a52a22;
         }
 
         .pixel-button:active {
-            transform: translateY(3px); /* Efeito de "pressionar" no clique */
+            transform: translateY(3px);
             box-shadow: 0 0 #a52a22;
         }
 
-        .pixel-button.full-width {
-            display: block;
-            width: 100%;
-        }
-
-         .pixel-button:disabled {
-            background-color: #95a5a6; /* Cor cinza para botões desabilitados */
+        .pixel-button:disabled {
+            background-color: #95a5a6;
             border-color: #7f8c8d;
             color: #bdc3c7;
             cursor: not-allowed;
@@ -90,178 +82,109 @@
             border: 2px solid #1a242f;
             border-radius: 5px;
             padding: 1rem;
-            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3); /* Sombra interna para efeito de profundidade */
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
         }
 
         .game-log {
             height: 150px;
-            overflow-y: auto; /* Adiciona barra de rolagem se o conteúdo exceder */
+            overflow-y: auto;
             background-color: #1a242f;
             border: 2px solid #000;
             padding: 0.75rem;
             font-size: 0.8rem;
             line-height: 1.4;
-            color: #95a5a6; /* Cor do texto do log */
+            color: #95a5a6;
             border-radius: 5px;
-            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
         }
 
-        .game-log p {
-            margin-bottom: 0.25rem;
-        }
-        /* Cores para diferentes tipos de mensagens no log */
-        .game-log p.text-yellow-400 { color: #f1c40f; } /* Importante */
-        .game-log p.text-red-400 { color: #e74c3c; } /* Combate/Dano ao jogador */
-        .game-log p.text-orange-400 { color: #f39c12; } /* Dano ao inimigo */
-        .game-log p.text-green-400 { color: #2ecc71; } /* Cura/Sucesso */
-        .game-log p.text-blue-300 { color: #85c1e9; } /* Informação neutra */
-
+        .game-log p { margin-bottom: 0.25rem; }
+        .game-log p.text-yellow-400 { color: #f1c40f; }
+        .game-log p.text-red-400 { color: #e74c3c; }
+        .game-log p.text-orange-400 { color: #f39c12; }
+        .game-log p.text-green-400 { color: #2ecc71; }
+        .game-log p.text-blue-300 { color: #85c1e9; }
 
         .modal {
-            display: none; /* Escondido por padrão */
-            position: absolute; /* Posição absoluta dentro do contêiner do jogo */
+            display: none;
+            position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%); /* Centraliza o modal */
+            transform: translate(-50%, -50%);
             background-color: #34495e;
             border: 4px solid #1a242f;
             border-radius: 8px;
             padding: 1.5rem 2rem;
-            z-index: 100; /* Garante que o modal fique acima de outros elementos */
+            z-index: 100;
             box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
             text-align: center;
-            width: 90%; /* Largura do modal */
-            max-width: 600px; /* Largura máxima do modal */
+            width: 90%;
+            max-width: 600px;
         }
         
-        .modal h2 {
-            font-size: 1.2rem;
+        #start-screen, #class-selection-modal, #game-screen {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
         }
 
-        .modal-content button {
-            margin-top: 1rem;
-        }
-
-        /* Estilos para tabelas */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-            font-size: 0.8rem;
-        }
-
-        th,
-        td {
-            border: 1px solid #555;
-            padding: 0.4rem;
-            text-align: left;
-        }
-
-        th {
-            background-color: #4a627a;
-            color: #f1c40f;
-        }
-
-        td {
-            background-color: #3e5166;
-        }
-
-        /* Estilos para a tela inicial */
         #start-screen {
-            display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 1.5rem;
         }
 
-        /* Estilos para a tela de jogo */
-        #game-screen {
-            display: none; /* Escondido por padrão */
+        #game-screen { display: none; }
+        
+        /* --- LÓGICA DE VISIBILIDADE DAS TELAS --- */
+        #default-view, #combat-scene {
+            display: none; /* Ambos começam escondidos */
             flex-direction: column;
-            gap: 1rem; /* Espaçamento entre as seções principais da tela do jogo */
+            gap: 1rem;
         }
         
-        #default-view { /* Container para a visão padrão (não-combate) */
+        /* Quando não está em combate, mostra a visão padrão */
+        #game-screen:not(.in-combat) #default-view {
+            display: flex;
+        }
+
+        /* Quando está em combate, mostra a cena de combate */
+        #game-screen.in-combat #combat-scene {
+            display: flex;
+        }
+        
+        /* --- ESTILOS DA VISÃO PADRÃO --- */
+        .stats-area, .actions-inventory-area {
             display: flex;
             flex-direction: column;
             gap: 1rem;
         }
 
-        .stats-area { /* Novo container para stats do jogador e inimigo */
+        @media (min-width: 768px) {
+            .stats-area, .actions-inventory-area { flex-direction: row; }
+        }
+
+        .player-panel, .enemy-panel, .inventory-panel { flex: 1; }
+        .actions-panel { flex: 2; }
+
+        .player-stats, .enemy-info {
             display: flex;
-            flex-direction: column; /* Empilha em telas pequenas */
-            gap: 1rem;
-        }
-
-        @media (min-width: 768px) { /* md breakpoint de Tailwind */
-            .stats-area {
-                flex-direction: row; /* Lado a lado em telas médias e maiores */
-            }
-        }
-
-        .player-panel, .enemy-panel {
-            flex: 1; /* Permite que os painéis dividam o espaço */
-        }
-
-        .player-stats,
-        .enemy-info {
-            display: flex;
-            flex-wrap: wrap; /* Permite que os itens quebrem linha se não couberem */
-            gap: 0.5rem 1rem; /* Espaçamento entre itens e linhas */
-            justify-content: center; /* Centraliza os itens quando quebram linha */
+            flex-wrap: wrap;
+            gap: 0.5rem 1rem;
+            justify-content: center;
             font-size: 0.85rem;
         }
 
-        .player-stats span,
-        .enemy-info span {
+        .player-stats span, .enemy-info span {
             background-color: #1a242f;
             padding: 0.4rem 0.8rem;
             border-radius: 4px;
             border: 1px solid #555;
-            white-space: nowrap; /* Evita quebra de linha dentro do span */
+            white-space: nowrap;
         }
         
-        .log-panel { /* Container para o game log */
-            /* O game-log em si já tem estilos */
-        }
-
-        .actions-inventory-area { /* Novo container para ações e mochila */
-            display: flex;
-            flex-direction: column; /* Empilha em telas pequenas */
-            gap: 1rem;
-        }
-
-        @media (min-width: 768px) { /* md breakpoint de Tailwind */
-            .actions-inventory-area {
-                flex-direction: row; /* Lado a lado em telas médias e maiores */
-            }
-        }
-
-        .actions-panel {
-            flex: 2; /* Painel de ações ocupa mais espaço */
-        }
-        .inventory-panel {
-            flex: 1; /* Painel da mochila ocupa menos espaço */
-        }
-
-        .game-actions {
-            display: grid; /* Usando grid para melhor controle dos botões */
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Colunas responsivas */
-            gap: 0.75rem; /* Espaçamento entre botões */
-        }
-
-        .game-actions .pixel-button {
-            width: 100%; /* Botões ocupam toda a largura da célula do grid */
-            padding: 0.6rem 0.5rem;
-            font-size: 0.8rem;
-        }
-
-        /* Estilos para a mochila */
         .inventory {
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
-            max-height: 150px; /* Altura máxima para a mochila, com scroll se necessário */
+            max-height: 150px;
             overflow-y: auto;
             background-color: #1a242f;
             border: 1px solid #555;
@@ -278,40 +201,16 @@
             justify-content: space-between;
             align-items: center;
             font-size: 0.8rem;
-            color: #ecf0f1;
-        }
-         .inventory p.empty-inventory-message { /* Classe específica para a mensagem de mochila vazia */
-            font-size: 0.8rem;
-            text-align: center;
-            padding: 0.5rem;
-            color: #95a5a6;
         }
 
-        /* Melhorias para o modal de seleção de classe */
-        #class-selection-modal .modal-content {
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-        #class-selection-modal #class-options {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-        #class-selection-modal #class-options .pixel-button {
-            width: 100%;
-        }
-
-        /* --- NOVOS ESTILOS PARA A CENA DE COMBATE --- */
+        /* --- ESTILOS DA CENA DE COMBATE --- */
         #combat-scene {
-            display: none; /* Começa escondido */
-            flex-direction: column;
-            background-color: #5a7d3c; /* Fundo verde, simulando campo de batalha */
+            background-color: #5a7d3c;
             border: 4px solid #1a242f;
             border-radius: 5px;
             padding: 1rem;
             position: relative;
-            height: 450px; /* Altura fixa para a cena */
+            height: 450px;
         }
         
         .combat-area {
@@ -326,7 +225,7 @@
         }
         
         #player-combat-area {
-            bottom: 130px; /* Posição acima da caixa de texto/ações */
+            bottom: 20px; /* Posição ajustada */
             left: 20px;
         }
 
@@ -335,16 +234,14 @@
             width: 100px;
             background-color: rgba(0,0,0,0.2);
             border: 2px dashed #1a242f;
-            display: inline-flex; /* Usando flex para centralizar o texto */
+            display: inline-flex;
             justify-content: center;
             align-items: center;
             font-size: 0.7rem;
-            color: #ecf0f1;
             margin-bottom: 10px;
         }
         
         #player-combat-area .sprite-placeholder {
-            /* Placeholder pode ser maior para o jogador */
             height: 120px;
             width: 120px;
         }
@@ -376,6 +273,7 @@
             overflow: hidden;
             display: flex;
             align-items: center;
+            position: relative; /* Para posicionar a barra de HP */
         }
         
         .hp-bar-label {
@@ -388,49 +286,44 @@
         }
 
         .hp-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
             height: 100%;
             background-color: #2ecc71; /* Verde */
             border-radius: 2px;
             transition: width 0.5s ease-out, background-color 0.5s ease;
-            position: absolute;
             z-index: 1;
         }
         
-        .hp-bar.yellow { background-color: #f1c40f; } /* Amarelo */
-        .hp-bar.red { background-color: #e74c3c; } /* Vermelho */
+        .hp-bar.yellow { background-color: #f1c40f; }
+        .hp-bar.red { background-color: #e74c3c; }
 
-        /* Ajustando a parte de baixo para o combate */
-        #combat-bottom-panel {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            padding: 0.5rem;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: row;
-            gap: 1rem;
+        #combat-player-hp-text {
+            text-align: right;
+            font-size: 0.8rem;
+            margin-top: 4px;
         }
-        #combat-bottom-panel .log-panel,
-        #combat-bottom-panel .actions-panel {
-            flex: 1;
-            margin: 0;
+        
+        /* --- AÇÕES E LOG (COMPARTILHADO) --- */
+        .game-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.75rem;
         }
-        #combat-bottom-panel .game-log {
-             height: 100px;
-        }
-        #combat-bottom-panel .actions-panel {
-            padding-top: 0;
-        }
-        #combat-bottom-panel .game-actions {
-             grid-template-columns: repeat(2, 1fr);
-             height: 115px;
+        
+        #game-screen.in-combat .actions-panel {
+            flex-basis: 50%;
         }
 
+        #game-screen.in-combat .inventory-panel {
+             display: none; /* Esconde inventário na tela de combate */
+        }
     </style>
 </head>
-<body class="selection:bg-yellow-400 selection:text-black">
+<body>
     <div class="game-container">
+        <!-- MODAL GENÉRICO -->
         <div id="game-modal" class="modal">
             <div class="modal-content">
                 <p id="modal-message" class="text-lg mb-4"></p>
@@ -438,62 +331,28 @@
             </div>
         </div>
 
+        <!-- TELA INICIAL -->
         <div id="start-screen">
             <h1>DUNGEONS CAVE</h1>
             <p class="text-center italic mb-4">"Aventure-se nas profundezas... se tiver coragem."</p>
             <button id="start-game-button" class="pixel-button mt-6">Escolher Classe</button>
         </div>
 
+        <!-- MODAL DE SELEÇÃO DE CLASSE -->
         <div id="class-selection-modal" class="modal">
-            <div class="modal-content">
-                <h2>Escolha sua Classe</h2>
-                <div id="class-options" class="mb-4">
-                    </div>
-                <button id="modal-class-ok-button" class="pixel-button full-width" disabled>Confirmar Classe</button>
-                <h3 class="mt-6 mb-2 text-base">Tabela de Classes e Armas (Referência D&D)</h3>
-                <div class="overflow-x-auto">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Classe</th>
-                                <th>Armas Simples</th>
-                                <th>Armas Marciais</th>
-                                <th>Observações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>Bárbaro</td><td>✔️</td><td>✔️</td><td>Usa quase todas as armas</td></tr>
-                            <tr><td>Bardo</td><td>✔️</td><td>Poucas</td><td>Espada curta, florete, rapieira e besta leve</td></tr>
-                            <tr><td>Clérigo</td><td>✔️</td><td>❌</td><td>Focado em armas simples</td></tr>
-                            <tr><td>Druida</td><td>✔️ (parcial)</td><td>❌</td><td>Só armas que não sejam de metal</td></tr>
-                            <tr><td>Guerreiro</td><td>✔️</td><td>✔️</td><td>Usa todas as armas</td></tr>
-                            <tr><td>Monge</td><td>✔️ (parcial)</td><td>❌</td><td>Armas simples e armas de monge</td></tr>
-                            <tr><td>Paladino</td><td>✔️</td><td>✔️</td><td>Usa todas as armas</td></tr>
-                            <tr><td>Patrulheiro</td><td>✔️</td><td>✔️</td><td>Usa todas as armas</td></tr>
-                            <tr><td>Ladino</td><td>✔️</td><td>Poucas</td><td>Espada curta, florete, rapieira e besta de mão</td></tr>
-                            <tr><td>Feiticeiro</td><td>✔️ (básico)</td><td>❌</td><td>Adaga, bastão, funda, besta leve, dardo</td></tr>
-                            <tr><td>Bruxo</td><td>✔️ (básico)</td><td>❌</td><td>Adaga, bastão, funda, besta leve, dardo</td></tr>
-                            <tr><td>Mago</td><td>✔️ (básico)</td><td>❌</td><td>Adaga, bastão, funda, besta leve, dardo</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <!-- Conteúdo do modal de classe (tabela, etc.) aqui -->
         </div>
 
+        <!-- TELA PRINCIPAL DO JOGO -->
         <div id="game-screen">
             <h2 id="screen-title" class="text-2xl">Aventura em Andamento!</h2>
             
+            <!-- CENA DE COMBATE (visível quando game-screen tem a classe 'in-combat') -->
             <div id="combat-scene">
                  <div id="enemy-combat-area" class="combat-area">
                     <div class="status-box" id="enemy-status-box">
-                        <div class="name-level">
-                            <span id="combat-enemy-name"></span>
-                            <span id="combat-enemy-level"></span>
-                        </div>
-                        <div class="hp-bar-container">
-                            <span class="hp-bar-label">HP</span>
-                            <div class="hp-bar" id="combat-enemy-hp-bar"></div>
-                        </div>
+                        <div class="name-level"><span id="combat-enemy-name"></span><span id="combat-enemy-level"></span></div>
+                        <div class="hp-bar-container"><span class="hp-bar-label">HP</span><div class="hp-bar" id="combat-enemy-hp-bar"></div></div>
                     </div>
                     <div class="sprite-placeholder">INIMIGO</div>
                 </div>
@@ -501,121 +360,410 @@
                 <div id="player-combat-area" class="combat-area">
                      <div class="sprite-placeholder">HERÓI</div>
                     <div class="status-box" id="player-status-box">
-                       <div class="name-level">
-                            <span id="combat-player-name"></span>
-                            <span id="combat-player-level"></span>
-                        </div>
-                        <div class="hp-bar-container">
-                             <span class="hp-bar-label">HP</span>
-                            <div class="hp-bar" id="combat-player-hp-bar"></div>
-                        </div>
-                         <div id="combat-player-hp-text" class="text-right text-xs mt-1"></div>
+                       <div class="name-level"><span id="combat-player-name"></span><span id="combat-player-level"></span></div>
+                        <div class="hp-bar-container"><span class="hp-bar-label">HP</span><div class="hp-bar" id="combat-player-hp-bar"></div></div>
+                        <div id="combat-player-hp-text"></div>
                     </div>
                 </div>
-                
-                <div id="combat-bottom-panel">
-                      </div>
             </div>
 
+            <!-- VISÃO PADRÃO/EXPLORAÇÃO (visível quando game-screen não tem a classe 'in-combat') -->
             <div id="default-view">
                 <div class="stats-area">
                     <div class="panel player-panel">
-                        <h3 class="text-lg">Seu Herói</h3>
-                        <div id="player-stats" class="player-stats">
-                            </div>
+                        <h3>Seu Herói</h3>
+                        <div id="player-stats" class="player-stats"></div>
                     </div>
                     <div class="panel enemy-panel">
-                        <h3 class="text-lg">Inimigo Atual</h3>
+                        <h3>Inimigo Próximo</h3>
                         <div id="enemy-info" class="enemy-info">
-                            <span id="enemy-name">Nenhum Inimigo</span>
+                            <span id="enemy-name">Nenhum</span>
                             <span id="enemy-hp">HP: --</span>
                         </div>
                     </div>
                 </div>
-
-                <div id="default-log-panel" class="panel log-panel">
-                    <h3 class="text-lg">Registro de Eventos</h3>
-                    <div id="game-log" class="game-log">
-                        <p>Bem-vindo à Dungeons Cave! Escolha uma classe para começar.</p>
-                    </div>
-                </div>
-                
-                <div id="default-actions-inventory-area" class="actions-inventory-area">
-                    <div class="panel actions-panel">
-                        <h3 class="text-lg">Ações</h3>
-                        <div id="game-actions" class="game-actions">
-                            <button id="explore-button" class="pixel-button">Explorar</button>
-                            <button id="attack-button" class="pixel-button" disabled>Atacar</button>
-                            <button id="ability-button" class="pixel-button" disabled>Habilidade</button> 
-                            <button id="flee-button" class="pixel-button" disabled>Fugir</button>
-                        </div>
-                    </div>
-                    <div class="panel inventory-panel">
-                        <h3 class="text-lg">Mochila</h3>
-                        <div id="inventory" class="inventory">
-                            <p class="empty-inventory-message">Sua mochila está vazia.</p>
-                        </div>
-                    </div>
+            </div>
+            
+            <!-- PAINÉIS DE LOG, AÇÕES E INVENTÁRIO (sempre visíveis, mas layout muda) -->
+            <div class="panel log-panel">
+                <h3>Registro de Eventos</h3>
+                <div id="game-log" class="game-log">
+                    <p>Bem-vindo à Dungeons Cave!</p>
                 </div>
             </div>
+            
+            <div class="actions-inventory-area">
+                <div class="panel actions-panel">
+                    <h3>Ações</h3>
+                    <div id="game-actions" class="game-actions">
+                        <button id="explore-button" class="pixel-button">Explorar</button>
+                        <button id="attack-button" class="pixel-button">Atacar</button>
+                        <button id="ability-button" class="pixel-button">Habilidade</button> 
+                        <button id="flee-button" class="pixel-button">Fugir</button>
+                    </div>
+                </div>
+                <div class="panel inventory-panel">
+                    <h3>Mochila</h3>
+                    <div id="inventory" class="inventory"></div>
+                </div>
+            </div>
+
         </div>
     </div>
 
     <script>
-        // Objeto global para armazenar todos os dados e estados do jogo
-        const gameData = {
-            classes: {
-                knight: { name: "Cavaleiro", description: "Tanque, defesa alta, espada e escudo.", ability: "Escudo Imbatível", baseHp: 120, baseAttack: 15, baseDefense: 10 },
-                rogue: { name: "Ladino", description: "Ágil, furtivo, dano crítico alto.", ability: "Ataque Furtivo", baseHp: 80, baseAttack: 25, baseDefense: 5 },
-                mage: { name: "Mago", description: "Mestre dos elementos, dano mágico em área.", ability: "Tempestade Arcana", baseHp: 70, baseAttack: 30, baseDefense: 3 },
-                cleric: { name: "Clérigo", description: "Suporte, cura, buffs e dano sagrado.", ability: "Bênção Divina", baseHp: 90, baseAttack: 20, baseDefense: 7 },
-                barbarian: { name: "Bárbaro", description: "Selvagem, dano físico bruto, pouca defesa.", ability: "Fúria Insana", baseHp: 110, baseAttack: 28, baseDefense: 4 },
-                hunter: { name: "Patrulheiro", description: "Perito em combate à distância, usa arcos.", ability: "Tiro Certeiro", baseHp: 85, baseAttack: 22, baseDefense: 6 }
-            },
-            selectedClassKey: null,
-            selectedClass: null,
-            
-            player: {
-                name: "",
-                level: 1, // Nível do jogador
-                hp: 0,
-                maxHp: 0,
-                attack: 0,
-                defense: 0,
-                abilityName: "",
-                inventory: [],
-                equippedWeapon: null,
-                specialAbilityUsedThisCombat: false
-            },
-            
-            currentEnemy: null,
-            inCombat: false, // Flag para controlar o estado de combate
-            
-            enemies: {
-                // Inimigos normais
-                goblin: { name: "Goblin Ardiloso", level: 1, hp: 30, maxHp: 30, attack: 8, defense: 2, gold: 5, lootTable: [{ item: "Poção de Cura Pequena", chance: 0.3 }] },
-                orc: { name: "Orc Brutal", level: 2, hp: 50, maxHp: 50, attack: 12, defense: 4, gold: 10, lootTable: [{ item: "Adaga Enferrujada", chance: 0.2 }] },
-                slime: { name: "Slime Ácido", level: 1, hp: 20, maxHp: 20, attack: 6, defense: 1, gold: 3, lootTable: [{ item: "Gosma Pegajosa", chance: 0.5 }] },
-                spider: { name: "Aranha Gigante", level: 2, hp: 40, maxHp: 40, attack: 10, defense: 3, gold: 7, lootTable: [{ item: "Teia Pegajosa", chance: 0.4 }] },
+        // --- Referências aos Elementos do DOM ---
+        const getEl = (id) => document.getElementById(id);
 
-                // Chefes Lendários
-                tarrasque: { name: "Tarrasque", level: 30, hp: 676, maxHp: 676, attack: 50, defense: 18, gold: 500, lootTable: [{ item: "Fragmento de Carapaça do Tarrasque", chance: 1.0 }] },
-                ancientRedDragon: { name: "Dragão Vermelho Ancestral", level: 24, hp: 546, maxHp: 546, attack: 45, defense: 15, gold: 300, lootTable: [{ item: "Escama de Dragão Rubra", chance: 1.0 }] },
-                aspectOfTiamat: { name: "Aspecto de Tiamat", level: 27, hp: 615, maxHp: 615, attack: 55, defense: 20, gold: 750, lootTable: [{ item: "Olho de Tiamat", chance: 1.0 }] },
-                kraken: { name: "Kraken", level: 23, hp: 472, maxHp: 472, attack: 40, defense: 12, gold: 250, lootTable: [{ item: "Tentáculo de Kraken", chance: 1.0 }] },
-                acererak: { name: "Acererak, o Lich", level: 21, hp: 285, maxHp: 285, attack: 60, defense: 14, gold: 400, lootTable: [{ item: "Cajado do Lich Supremo", chance: 0.2 }] },
-                balor: { name: "Balor", level: 19, hp: 262, maxHp: 262, attack: 40, defense: 13, gold: 200, lootTable: [{ item: "Chicote de Fogo Demoníaco", chance: 0.3 }] }
+        const gameContainer = getEl('game-container');
+        const startScreen = getEl('start-screen');
+        const classSelectionModal = getEl('class-selection-modal');
+        const gameScreen = getEl('game-screen');
+        const gameModal = getEl('game-modal');
+        const startGameBtn = getEl('start-game-button');
+        const screenTitle = getEl('screen-title');
+
+        // Visão Padrão
+        const defaultView = getEl('default-view');
+        const playerStatsDiv = getEl('player-stats');
+        const enemyNameSpan = getEl('enemy-name');
+        const enemyHpSpan = getEl('enemy-hp');
+        
+        // Cena de Combate
+        const combatScene = getEl('combat-scene');
+        const combatPlayerName = getEl('combat-player-name');
+        const combatPlayerLevel = getEl('combat-player-level');
+        const combatPlayerHpBar = getEl('combat-player-hp-bar');
+        const combatPlayerHpText = getEl('combat-player-hp-text');
+        const combatEnemyName = getEl('combat-enemy-name');
+        const combatEnemyLevel = getEl('combat-enemy-level');
+        const combatEnemyHpBar = getEl('combat-enemy-hp-bar');
+        
+        // Elementos Compartilhados
+        const gameLogDiv = getEl('game-log');
+        const inventoryDiv = getEl('inventory');
+        const exploreButton = getEl('explore-button');
+        const attackButton = getEl('attack-button');
+        const abilityButton = getEl('ability-button');
+        const fleeButton = getEl('flee-button');
+        const modalMessage = getEl('modal-message');
+        const modalOkBtn = getEl('modal-ok-button');
+
+        // --- Objeto de Dados do Jogo ---
+        const gameData = {
+            inCombat: false,
+            player: { level: 1 },
+            currentEnemy: null,
+            classes: {
+                knight: { name: "Cavaleiro", ability: "Escudo Imbatível", baseHp: 120, baseAttack: 15, baseDefense: 10 },
+                rogue: { name: "Ladino", ability: "Ataque Furtivo", baseHp: 80, baseAttack: 25, baseDefense: 5 },
+                mage: { name: "Mago", ability: "Tempestade Arcana", baseHp: 70, baseAttack: 30, baseDefense: 3 },
             },
-            
+            enemies: {
+                // NOVOS MONSTROS FRACOS
+                giantRat: { name: "Rato Gigante", level: 1, hp: 15, maxHp: 15, attack: 4, defense: 1, lootTable: [{ item: "Poção de Cura Pequena", chance: 0.1 }] },
+                caveBat: { name: "Morcego da Caverna", level: 1, hp: 18, maxHp: 18, attack: 5, defense: 1, lootTable: [] },
+                smallSpider: { name: "Aranha Pequena", level: 2, hp: 22, maxHp: 22, attack: 6, defense: 2, lootTable: [{ item: "Poção de Cura Pequena", chance: 0.15 }] },
+                // Monstros existentes
+                goblin: { name: "Goblin Ardiloso", level: 2, hp: 30, maxHp: 30, attack: 8, defense: 2, lootTable: [{ item: "Poção de Cura Pequena", chance: 0.3 }] },
+                orc: { name: "Orc Brutal", level: 3, hp: 50, maxHp: 50, attack: 12, defense: 4, lootTable: [{ item: "Adaga Enferrujada", chance: 0.2 }] },
+            },
             items: {
-                "Poção de Cura Pequena": { type: "potion", effect: "heal", power: 20, consumable: true, description: "Restaura 20 HP." },
-                "Adaga Enferrujada": { type: "weapon", attackBonus: 2, description: "Uma adaga velha, mas ainda pontuda." },
-                "Espada Curta de Iniciante": { type: "weapon", attackBonus: 3, description: "Uma espada básica para aventureiros." },
-                "Cajado do Lich Supremo": { type: "weapon", attackBonus: 25, description: "Um cajado imbuído de magia necrótica suprema." },
-                "Chicote de Fogo Demoníaco": { type: "weapon", attackBonus: 20, description: "Um chicote que arde com fogo infernal." },
-                "Gosma Pegajosa": { type: "junk", description: "Uma gosma nojenta." },
-                "Teia Pegajosa": { type: "junk", description: "Uma teia grudenta." },
-                "Fragmento de Carapaça do Tarrasque": { type: "crafting_material", description: "Um pedaço da carapaça indestrutível do Tarrasque." },
-                "Escama de Dragão Rubra": { type: "crafting_material", description: "Uma escama vermelha brilhante de um dragão ancestral." },
-                "Olho de Tiamat": { type: "magic_artifact", description: "Um olho de Tiamat, a Rainha Dragão." },
-                "Tentáculo de Kraken": { type:
+                "Poção de Cura Pequena": { type: "potion", effect: "heal", power: 20, consumable: true },
+                "Adaga Enferrujada": { type: "weapon", attackBonus: 2 },
+            }
+        };
+
+        // --- Funções de UI ---
+
+        function showModal(message, onOkCallback = null) {
+            modalMessage.textContent = message;
+            gameModal.style.display = 'block';
+            modalOkBtn.onclick = () => {
+                gameModal.style.display = 'none';
+                if (onOkCallback) onOkCallback();
+            };
+        }
+
+        function logEvent(message, type = 'normal') {
+            const p = document.createElement('p');
+            p.textContent = message;
+            const classMap = {
+                important: 'text-yellow-400', combat: 'text-red-400',
+                player_damage: 'text-red-400', enemy_damage: 'text-orange-400',
+                heal: 'text-green-400', success: 'text-green-400',
+                info: 'text-blue-300'
+            };
+            if(classMap[type]) p.classList.add(...classMap[type].split(' '));
+            gameLogDiv.appendChild(p);
+            gameLogDiv.scrollTop = gameLogDiv.scrollHeight;
+        }
+
+        function updateAllUI() {
+            updatePlayerStats();
+            updateEnemyInfo();
+            updateCombatUI();
+            renderInventory();
+            updateActionButtons();
+        }
+
+        function updatePlayerStats() {
+            const player = gameData.player;
+            if(!player.name) return;
+            const totalAttack = player.attack + (player.equippedWeapon ? player.equippedWeapon.attackBonus : 0);
+            playerStatsDiv.innerHTML = `
+                <span>${player.name} Nv.${player.level}</span>
+                <span>HP: ${player.hp}/${player.maxHp}</span>
+                <span>Ataque: ${totalAttack}</span>
+                <span>Defesa: ${player.defense}</span>
+            `;
+        }
+
+        function updateEnemyInfo() {
+             const enemy = gameData.currentEnemy;
+             // Este painel só é visível fora de combate
+             if(enemy && !gameData.inCombat) {
+                 enemyNameSpan.textContent = `${enemy.name}`;
+                 enemyHpSpan.textContent = `HP: ${enemy.hp}`;
+             } else {
+                 enemyNameSpan.textContent = "Nenhum";
+                 enemyHpSpan.textContent = "HP: --";
+             }
+        }
+        
+        function updateCombatUI() {
+            if (!gameData.inCombat) return;
+            const player = gameData.player;
+            const enemy = gameData.currentEnemy;
+
+            combatPlayerName.textContent = player.name;
+            combatPlayerLevel.textContent = `Nv${player.level}`;
+            updateHealthBar(combatPlayerHpBar, player.hp, player.maxHp);
+            combatPlayerHpText.textContent = `${player.hp} / ${player.maxHp}`;
+
+            combatEnemyName.textContent = enemy.name;
+            combatEnemyLevel.textContent = `Nv${enemy.level}`;
+            updateHealthBar(combatEnemyHpBar, enemy.hp, enemy.maxHp);
+        }
+
+        function updateHealthBar(barElement, current, max) {
+            const percentage = Math.max(0, (current / max) * 100);
+            barElement.style.width = `${percentage}%`;
+            barElement.classList.remove('green', 'yellow', 'red');
+            if (percentage <= 25) barElement.classList.add('red');
+            else if (percentage <= 50) barElement.classList.add('yellow');
+            else barElement.classList.add('green');
+        }
+
+        function updateActionButtons() {
+            exploreButton.disabled = gameData.inCombat;
+            attackButton.disabled = !gameData.inCombat;
+            abilityButton.disabled = !gameData.inCombat || gameData.player.specialAbilityUsedThisCombat;
+            fleeButton.disabled = !gameData.inCombat;
+        }
+
+        function renderInventory() {
+            inventoryDiv.innerHTML = '';
+            if (!gameData.player.inventory || gameData.player.inventory.length === 0) {
+                inventoryDiv.innerHTML = '<p class="text-gray-400 text-sm text-center">Vazia</p>';
+                return;
+            }
+            gameData.player.inventory.forEach(itemName => {
+                const item = gameData.items[itemName];
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'inventory-item';
+                itemDiv.innerHTML = `<span>${itemName}</span> <button class="pixel-button text-xs py-1 px-2 use-item-btn" data-item="${itemName}">Usar</button>`;
+                inventoryDiv.appendChild(itemDiv);
+            });
+            document.querySelectorAll('.use-item-btn').forEach(btn => {
+                btn.onclick = (e) => useItem(e.target.dataset.item);
+            });
+        }
+        
+        // --- Funções de Lógica do Jogo ---
+
+        function selectClass(classKey) {
+            const cls = gameData.classes[classKey];
+            const player = gameData.player;
+            player.name = cls.name;
+            player.maxHp = cls.baseHp;
+            player.hp = cls.baseHp;
+            player.attack = cls.baseAttack;
+            player.defense = cls.baseDefense;
+            player.abilityName = cls.ability;
+            player.inventory = ["Poção de Cura Pequena"];
+
+            classSelectionModal.style.display = 'none';
+            startScreen.style.display = 'none';
+            gameScreen.style.display = 'flex';
+            
+            logEvent(`Você é um ${cls.name}!`, 'important');
+            updateAllUI();
+        }
+
+        function explore() {
+            logEvent("Você explora a masmorra...", 'info');
+            // 50% de chance de encontrar um inimigo
+            if (Math.random() > 0.5) {
+                logEvent("...mas não encontra nada.", 'info');
+                return;
+            }
+            const enemyKeys = Object.keys(gameData.enemies);
+            const randomKey = enemyKeys[Math.floor(Math.random() * enemyKeys.length)];
+            startCombat(randomKey);
+        }
+
+        function startCombat(enemyKey) {
+            const enemyTemplate = gameData.enemies[enemyKey];
+            gameData.currentEnemy = { ...enemyTemplate }; // Clona o inimigo
+            gameData.player.specialAbilityUsedThisCombat = false;
+            gameData.inCombat = true;
+            
+            gameScreen.classList.add('in-combat');
+            screenTitle.textContent = "EM COMBATE!";
+            logEvent(`Um ${gameData.currentEnemy.name} aparece!`, 'important');
+            
+            updateAllUI();
+        }
+
+        function endCombat(fled = false) {
+            if (!fled) {
+                const enemy = gameData.currentEnemy;
+                logEvent(`Você derrotou o ${enemy.name}!`, 'success');
+                enemy.lootTable.forEach(drop => {
+                    if (Math.random() < drop.chance) {
+                        gameData.player.inventory.push(drop.item);
+                        logEvent(`Você encontrou: ${drop.item}!`, 'info');
+                    }
+                });
+            }
+
+            gameData.inCombat = false;
+            gameData.currentEnemy = null;
+            gameScreen.classList.remove('in-combat');
+            screenTitle.textContent = "Aventura em Andamento!";
+            updateAllUI();
+        }
+
+        function attack() {
+            if (!gameData.inCombat) return;
+
+            const player = gameData.player;
+            const enemy = gameData.currentEnemy;
+            const playerAttack = player.attack + (player.equippedWeapon?.attackBonus || 0);
+            const damage = Math.max(1, Math.floor(playerAttack * (1 + Math.random()*0.1)) - enemy.defense);
+            
+            enemy.hp -= damage;
+            logEvent(`Você ataca e causa ${damage} de dano!`, 'enemy_damage');
+            
+            if (enemy.hp <= 0) {
+                endCombat();
+            } else {
+                disableActions(true);
+                setTimeout(enemyTurn, 1000);
+            }
+            updateCombatUI();
+        }
+
+        function enemyTurn() {
+            if (!gameData.inCombat) return;
+            const player = gameData.player;
+            const enemy = gameData.currentEnemy;
+            const damage = Math.max(1, Math.floor(enemy.attack * (1 + Math.random()*0.1)) - player.defense);
+
+            player.hp -= damage;
+            logEvent(`O ${enemy.name} ataca e causa ${damage} de dano!`, 'player_damage');
+            
+            if (player.hp <= 0) {
+                player.hp = 0;
+                gameOver();
+            } else {
+                disableActions(false);
+            }
+            updateAllUI();
+        }
+        
+        function useSpecialAbility() {
+             const player = gameData.player;
+             logEvent(`${player.name} usa ${player.abilityName}!`, 'success');
+             player.defense += 5; // Exemplo simples de buff de defesa
+             logEvent("Sua defesa aumentou temporariamente!", 'info');
+             player.specialAbilityUsedThisCombat = true;
+
+             disableActions(true);
+             setTimeout(enemyTurn, 1000);
+             updateAllUI();
+        }
+        
+        function flee() {
+            if (Math.random() < 0.5) {
+                logEvent("Você conseguiu fugir!", 'success');
+                endCombat(true);
+            } else {
+                logEvent("A fuga falhou!", 'player_damage');
+                disableActions(true);
+                setTimeout(enemyTurn, 1000);
+            }
+        }
+        
+        function useItem(itemName) {
+            const item = gameData.items[itemName];
+            if (!item?.consumable) return;
+            
+            if(item.type === 'potion' && item.effect === 'heal') {
+                const player = gameData.player;
+                player.hp = Math.min(player.maxHp, player.hp + item.power);
+                logEvent(`Você usou ${itemName} e recuperou ${item.power} HP.`, 'heal');
+            }
+            
+            const itemIndex = gameData.player.inventory.indexOf(itemName);
+            if (itemIndex > -1) gameData.player.inventory.splice(itemIndex, 1);
+            
+            updateAllUI();
+        }
+
+        function disableActions(disabled) {
+            attackButton.disabled = disabled;
+            abilityButton.disabled = disabled || gameData.player.specialAbilityUsedThisCombat;
+            fleeButton.disabled = disabled;
+        }
+
+        function gameOver() {
+            disableActions(true);
+            showModal("Você foi derrotado... A masmorra o consumiu.", () => window.location.reload());
+        }
+
+        function initialize() {
+            // Preencher modal de seleção de classe
+            classSelectionModal.innerHTML = `
+                <div class="modal-content">
+                    <h2>Escolha sua Classe</h2>
+                    <div id="class-options" class="my-4 grid grid-cols-2 gap-4"></div>
+                </div>
+            `;
+            const classOptionsDiv = getEl('class-options');
+            for (const key in gameData.classes) {
+                const button = document.createElement('button');
+                button.className = 'pixel-button';
+                button.textContent = gameData.classes[key].name;
+                button.onclick = () => selectClass(key);
+                classOptionsDiv.appendChild(button);
+            }
+            
+            // Listeners dos botões
+            startGameBtn.onclick = () => classSelectionModal.style.display = 'block';
+            exploreButton.onclick = explore;
+            attackButton.onclick = attack;
+            abilityButton.onclick = useSpecialAbility;
+            fleeButton.onclick = flee;
+            
+            updateActionButtons();
+            logEvent("Escolha uma classe para começar.", 'important');
+        }
+
+        // --- Iniciar Jogo ---
+        initialize();
+
+    </script>
+</body>
+</html>
