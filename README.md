@@ -547,225 +547,383 @@
             const percentage = Math.max(0, (current / max) * 100);
             barElement.style.width = `${percentage}%`;
             barElement.classList.remove('green', 'yellow', 'red');
-            if (percentage <= 25) barElement.classList.add('red');
-            else if (percentage <= 50) barElement.classList.add('yellow');
+            if (percend('yellow');
             else barElement.classList.add('green');
         }
 
         function updateActionButtons() {
-            exploreButton.disabled = gameData.inCombat;
-            attackButton.disabled = !gameData.inCombat;
-            abilityButton.disabled = !gameData.inCombat || gameData.player.specialAbilityUsedThisCombat;
-            fleeButton.disabled = !gameData.inCombat;
+            const inCombat = gameData.inCombat;
+            exploreButton.disabled = inCombat;
+            attackButton.disabled = !inCombat;
+            abilityButton.disabled = !inCombat;
+            fleeButton.disabled = !inCombat;
+            
+            // Gerencia a visibilidade das seções
+            if (inCombat) {
+                gameScreen.classList.add('in-combat');
+                screenTitle.textContent = "Em Combate!";
+            } else {
+                gameScreen.classList.remove('in-combat');
+                screenTitle.textContent = "Aventura em Andamento!";
+            }
         }
 
         function renderInventory() {
             inventoryDiv.innerHTML = '';
-            if (!gameData.player.inventory || gameData.player.inventory.length === 0) {
-                inventoryDiv.innerHTML = '<p class="text-gray-400 text-sm text-center">Vazia</p>';
+            if (gameData.player.inventory.length === 0) {
+                inventoryDiv.innerHTML = '<p class="text-center text-gray-400">Mochila vazia.</p>';
                 return;
             }
-            gameData.player.inventory.forEach(itemName => {
-                const item = gameData.items[itemName];
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'inventory-item';
-                itemDiv.innerHTML = `<span>${itemName}</span> <button class="pixel-button text-xs py-1 px-2 use-item-btn" data-item="${itemName}">Usar</button>`;
-                inventoryDiv.appendChild(itemDiv);
+            gameData.player.inventory.forEach(item => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'inventory-item';
+                itemEl.innerHTML = `
+                    <span>${item.name} (${item.quantity})</span>
+                    <button class="pixel-button text-xs px-2 py-1 use-item-btn" data-item="${item.name}">Usar</button>
+                `;
+                inventoryDiv.appendChild(itemEl);
             });
-            document.querySelectorAll('.use-item-btn').forEach(btn => {
-                btn.onclick = (e) => useItem(e.target.dataset.item);
+
+            document.querySelectorAll('.use-item-btn').forEach(button => {
+                button.onclick = (e) => {
+                    const itemName = e.target.dataset.item;
+                    useItem(itemName);
+                };
             });
+        }
+
+        // --- Funções de Jogo ---
+
+        function startGame() {
+            startScreen.style.display = 'none';
+            classSelectionModal.style.display = 'block';
+            renderClassSelection();
+        }
+
+        function renderClassSelection() {
+            classSelectionModal.innerHTML = `
+                <h2 class="text-xl mb-4">Escolha sua Classe</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    ${Object.entries(gameData.classes).map(([id, cls]) => `
+                        <button class="pixel-button class-select-btn" data-class="${id}">
+                            ${cls.name}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+            document.querySelectorAll('.class-select-btn').forEach(button => {
+                button.onclick = (e) => selectClass(e.target.dataset.class);
+            });
+        }
+
+        function selectClass(classId) {
+            const selectedClass = gameData.classes[classId];
+            gameData.player = {
+                name: selectedClass.name,
+                class: classId,
+                level: 1,
+                hp: selectedClass.baseHp,
+                maxHp: selectedClass.baseHp,
+                attack: selectedClass.baseAttack,
+                defense: selectedClass.baseDefense,
+                ability: selectedClass.ability,
+                xp: 0,
+                xpToNextLevel: 100,
+                gold: 0,
+                inventory: [],
+                equippedWeapon: null,
+                monstersSlain: 0, // Contador de monstros abatidos
+                image: selectedClass.image
+            };
+            logEvent(`Você escolheu ser um ${selectedClass.name}!`, 'success');
+            classSelectionModal.style.display = 'none';
+            gameScreen.style.display = 'flex';
+            playerSprite.src = selectedClass.image;
+            updateAllUI();
         }
         
-        // --- Funções de Lógica do Jogo ---
-
-        function selectClass(classKey) {
-            const cls = gameData.classes[classKey];
-            const player = gameData.player;
-            player.name = cls.name;
-            player.maxHp = cls.baseHp;
-            player.hp = cls.baseHp;
-            player.attack = cls.baseAttack;
-            player.defense = cls.baseDefense;
-            player.abilityName = cls.ability;
-            player.image = cls.image; // Guarda a URL da imagem
-            player.inventory = ["Poção de Cura Pequena"];
-
-            playerSprite.src = player.image; // Define a imagem do jogador
-            
-            classSelectionModal.style.display = 'none';
-            startScreen.style.display = 'none';
-            gameScreen.style.display = 'flex';
-            
-            logEvent(`Você é um ${cls.name}!`, 'important');
+        function gainXp(amount) {
+            gameData.player.xp += amount;
+            logEvent(`Você ganhou ${amount} de XP!`, 'info');
+            if (gameData.player.xp >= gameData.player.xpToNextLevel) {
+                levelUp();
+            }
             updateAllUI();
         }
 
-        function explore() {
-            logEvent("Você explora a masmorra...", 'info');
-            if (Math.random() > 0.5) {
-                logEvent("...mas não encontra nada.", 'info');
+        function levelUp() {
+            const player = gameData.player;
+            player.level++;
+            player.xp -= player.xpToNextLevel;
+            player.xpToNextLevel = Math.floor(player.xpToNextLevel * 1.5);
+            player.maxHp += 15; // Ganho de HP por nível
+            player.hp = player.maxHp; // Cura total ao subir de nível
+            player.attack += 3; // Ganho de Ataque por nível
+            player.defense += 1; // Ganho de Defesa por nível
+            logEvent(`Parabéns! Você alcançou o Nível ${player.level}!`, 'important');
+            showModal(`Parabéns! Você alcançou o Nível ${player.level}!`, updateAllUI);
+        }
+
+        function addItemToInventory(itemName, quantity = 1) {
+            const existingItem = gameData.player.inventory.find(item => item.name === itemName);
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                gameData.player.inventory.push({ name: itemName, quantity: quantity });
+            }
+            logEvent(`Você pegou ${quantity}x ${itemName}.`, 'info');
+            renderInventory();
+        }
+
+        function removeItemFromInventory(itemName, quantity = 1) {
+            const itemIndex = gameData.player.inventory.findIndex(item => item.name === itemName);
+            if (itemIndex > -1) {
+                gameData.player.inventory[itemIndex].quantity -= quantity;
+                if (gameData.player.inventory[itemIndex].quantity <= 0) {
+                    gameData.player.inventory.splice(itemIndex, 1);
+                }
+                renderInventory();
+                return true;
+            }
+            return false;
+        }
+
+        function useItem(itemName) {
+            const itemInfo = gameData.items[itemName];
+            const player = gameData.player;
+
+            if (!itemInfo) {
+                logEvent(`Não foi possível usar ${itemName}.`, 'error');
                 return;
             }
-            const enemyKeys = Object.keys(gameData.enemies);
-            const randomKey = enemyKeys[Math.floor(Math.random() * enemyKeys.length)];
-            startCombat(randomKey);
+
+            if (itemInfo.type === "potion" && itemInfo.effect === "heal") {
+                if (player.hp === player.maxHp) {
+                    logEvent("Sua vida já está cheia!", 'info');
+                    return;
+                }
+                const healAmount = itemInfo.power;
+                player.hp = Math.min(player.maxHp, player.hp + healAmount);
+                logEvent(`Você usou ${itemName} e recuperou ${healAmount} de HP.`, 'heal');
+                removeItemFromInventory(itemName);
+                updateAllUI();
+            } else if (itemInfo.type === "weapon") {
+                if (player.equippedWeapon && player.equippedWeapon.name === itemName) {
+                    logEvent(`Você já está usando ${itemName}.`, 'info');
+                    return;
+                }
+                // Desequipa a arma atual, se houver
+                if (player.equippedWeapon) {
+                    addItemToInventory(player.equippedWeapon.name);
+                    logEvent(`Você guardou sua ${player.equippedWeapon.name}.`, 'info');
+                }
+                // Equipa a nova arma
+                player.equippedWeapon = { name: itemName, attackBonus: itemInfo.attackBonus };
+                removeItemFromInventory(itemName);
+                logEvent(`Você equipou a ${itemName}. Seu ataque aumentou!`, 'success');
+                updateAllUI();
+            } else {
+                logEvent(`Você não pode usar ${itemName} agora.`, 'info');
+            }
         }
 
-        function startCombat(enemyKey) {
-            const enemyTemplate = gameData.enemies[enemyKey];
-            gameData.currentEnemy = { ...enemyTemplate };
-            gameData.player.specialAbilityUsedThisCombat = false;
+        // --- Lógica de Combate ---
+        function enterCombat(enemy) {
             gameData.inCombat = true;
-            
-            enemySprite.src = gameData.currentEnemy.image; // Define a imagem do inimigo
-            
-            gameScreen.classList.add('in-combat');
-            screenTitle.textContent = "EM COMBATE!";
-            logEvent(`Um ${gameData.currentEnemy.name} aparece!`, 'important');
-            
+            gameData.currentEnemy = { ...enemy }; // Clona o inimigo para não alterar o original
+            logEvent(`Você encontrou um(a) ${enemy.name}! Prepare-se para a batalha!`, 'combat');
+            enemySprite.src = enemy.image;
+            playerSprite.src = gameData.player.image;
             updateAllUI();
         }
 
-        function endCombat(fled = false) {
-            if (!fled) {
-                const enemy = gameData.currentEnemy;
-                logEvent(`Você derrotou o ${enemy.name}!`, 'success');
-                enemy.lootTable.forEach(drop => {
-                    if (Math.random() < drop.chance) {
-                        gameData.player.inventory.push(drop.item);
-                        logEvent(`Você encontrou: ${drop.item}!`, 'info');
-                    }
-                });
-            }
-
+        function endCombat() {
             gameData.inCombat = false;
             gameData.currentEnemy = null;
-            enemySprite.src = ""; // Limpa a imagem do inimigo
-            gameScreen.classList.remove('in-combat');
-            screenTitle.textContent = "Aventura em Andamento!";
             updateAllUI();
+            logEvent("O combate terminou.", 'info');
         }
 
-        function attack() {
+        function playerAttack() {
             if (!gameData.inCombat) return;
 
             const player = gameData.player;
             const enemy = gameData.currentEnemy;
-            const playerAttack = player.attack + (player.equippedWeapon?.attackBonus || 0);
-            const damage = Math.max(1, Math.floor(playerAttack * (1 + Math.random()*0.1)) - enemy.defense);
+            
+            const totalPlayerAttack = player.attack + (player.equippedWeapon?.attackBonus || 0);
+            let damage = Math.max(0, totalPlayerAttack - enemy.defense);
             
             enemy.hp -= damage;
-            logEvent(`Você ataca e causa ${damage} de dano!`, 'enemy_damage');
+            logEvent(`${player.name} atacou ${enemy.name} causando ${damage} de dano!`, 'player_damage');
             
             if (enemy.hp <= 0) {
+                enemy.hp = 0; // Garante que a HP não seja negativa na UI
+                logEvent(`${enemy.name} foi derrotado!`, 'success');
+                gameData.player.monstersSlain++; // Incrementa o contador
+                gainXp(enemy.level * 20); // Exemplo de XP
+                handleLoot(enemy);
                 endCombat();
+                checkBossSpawn(); // Verifica se é hora de aparecer um boss
             } else {
-                disableActions(true);
-                setTimeout(enemyTurn, 1000);
+                enemyTurn();
             }
-            updateCombatUI();
+            updateAllUI();
         }
 
         function enemyTurn() {
             if (!gameData.inCombat) return;
+
             const player = gameData.player;
             const enemy = gameData.currentEnemy;
-            const damage = Math.max(1, Math.floor(enemy.attack * (1 + Math.random()*0.1)) - player.defense);
 
+            let damage = Math.max(0, enemy.attack - player.defense);
             player.hp -= damage;
-            logEvent(`O ${enemy.name} ataca e causa ${damage} de dano!`, 'player_damage');
-            
+            logEvent(`${enemy.name} atacou ${player.name} causando ${damage} de dano!`, 'enemy_damage');
+
             if (player.hp <= 0) {
-                player.hp = 0;
-                gameOver();
-            } else {
-                disableActions(false);
+                player.hp = 0; // Garante que a HP não seja negativa na UI
+                logEvent("Você foi derrotado! Fim de jogo.", 'important');
+                showModal("Você foi derrotado! Tente novamente.", () => location.reload()); // Reinicia o jogo
             }
             updateAllUI();
         }
-        
-        function useSpecialAbility() {
-             const player = gameData.player;
-             logEvent(`${player.name} usa ${player.abilityName}!`, 'success');
-             player.defense += 5;
-             logEvent("Sua defesa aumentou temporariamente!", 'info');
-             player.specialAbilityUsedThisCombat = true;
 
-             disableActions(true);
-             setTimeout(enemyTurn, 1000);
-             updateAllUI();
-        }
-        
-        function flee() {
-            if (Math.random() < 0.5) {
-                logEvent("Você conseguiu fugir!", 'success');
-                endCombat(true);
+        function useAbility() {
+            const player = gameData.player;
+            const enemy = gameData.currentEnemy;
+
+            if (!gameData.inCombat) {
+                logEvent("Você só pode usar habilidades em combate.", 'info');
+                return;
+            }
+
+            logEvent(`${player.name} usou ${player.ability}!`, 'info');
+
+            switch (player.class) {
+                case 'knight':
+                    // Cavaleiro: Aumenta a defesa temporariamente ou reflete dano
+                    logEvent("Seu Escudo Imbatível o protege!", 'info');
+                    const defenseBoost = 5;
+                    const originalDefense = player.defense;
+                    player.defense += defenseBoost;
+                    logEvent(`Sua defesa aumentou em ${defenseBoost} por um turno!`, 'success');
+                    updateAllUI();
+                    // O efeito dura apenas um turno do inimigo
+                    setTimeout(() => {
+                        if (gameData.inCombat) { // Assegura que o efeito só se reverte se ainda estiver em combate
+                            player.defense = originalDefense;
+                            logEvent("O efeito do Escudo Imbatível passou.", 'info');
+                            updateAllUI();
+                        }
+                    }, 1000); // Pequeno atraso para o log aparecer antes do inimigo atacar
+                    break;
+                case 'rogue':
+                    // Ladino: Grande dano ou chance de crítico
+                    let stealthDamage = player.attack * 2;
+                    enemy.hp -= stealthDamage;
+                    logEvent(`Seu Ataque Furtivo causou ${stealthDamage} de dano crítico!`, 'player_damage');
+                    break;
+                case 'mage':
+                    // Mago: Dano em área (se tiver múltiplos inimigos) ou dano mágico alto
+                    let arcaneDamage = player.attack * 1.5;
+                    enemy.hp -= arcaneDamage;
+                    logEvent(`Sua Tempestade Arcana atingiu ${enemy.name} causando ${arcaneDamage} de dano mágico!`, 'player_damage');
+                    break;
+                default:
+                    logEvent("Habilidade desconhecida.", 'error');
+            }
+
+            if (enemy.hp <= 0) {
+                enemy.hp = 0;
+                logEvent(`${enemy.name} foi derrotado!`, 'success');
+                gameData.player.monstersSlain++;
+                gainXp(enemy.level * 20);
+                handleLoot(enemy);
+                endCombat();
+                checkBossSpawn();
             } else {
-                logEvent("A fuga falhou!", 'player_damage');
-                disableActions(true);
-                setTimeout(enemyTurn, 1000);
+                enemyTurn();
             }
-        }
-        
-        function useItem(itemName) {
-            const item = gameData.items[itemName];
-            if (!item?.consumable) return;
-            
-            if(item.type === 'potion' && item.effect === 'heal') {
-                const player = gameData.player;
-                player.hp = Math.min(player.maxHp, player.hp + item.power);
-                logEvent(`Você usou ${itemName} e recuperou ${item.power} HP.`, 'heal');
-            }
-            
-            const itemIndex = gameData.player.inventory.indexOf(itemName);
-            if (itemIndex > -1) gameData.player.inventory.splice(itemIndex, 1);
-            
             updateAllUI();
         }
 
-        function disableActions(disabled) {
-            attackButton.disabled = disabled;
-            abilityButton.disabled = disabled || gameData.player.specialAbilityUsedThisCombat;
-            fleeButton.disabled = disabled;
-        }
-
-        function gameOver() {
-            disableActions(true);
-            showModal("Você foi derrotado... A masmorra o consumiu.", () => window.location.reload());
-        }
-
-        function initialize() {
-            // Preencher modal de seleção de classe
-            classSelectionModal.innerHTML = `
-                <div class="modal-content">
-                    <h2>Escolha sua Classe</h2>
-                    <div id="class-options" class="my-4 grid grid-cols-2 gap-4"></div>
-                </div>
-            `;
-            const classOptionsDiv = getEl('class-options');
-            for (const key in gameData.classes) {
-                const button = document.createElement('button');
-                button.className = 'pixel-button';
-                button.textContent = gameData.classes[key].name;
-                button.onclick = () => selectClass(key);
-                classOptionsDiv.appendChild(button);
+        function fleeCombat() {
+            if (!gameData.inCombat) {
+                logEvent("Você não está em combate para fugir.", 'info');
+                return;
             }
-            
-            // Listeners dos botões
-            startGameBtn.onclick = () => classSelectionModal.style.display = 'block';
-            exploreButton.onclick = explore;
-            attackButton.onclick = attack;
-            abilityButton.onclick = useSpecialAbility;
-            fleeButton.onclick = flee;
-            
-            updateActionButtons();
-            logEvent("Escolha uma classe para começar.", 'important');
+            const fleeChance = Math.random();
+            if (fleeChance > 0.5) { // 50% de chance de fuga
+                logEvent("Você conseguiu fugir do combate!", 'info');
+                endCombat();
+            } else {
+                logEvent("Você falhou em fugir!", 'combat');
+                enemyTurn(); // Inimigo ataca se a fuga falhar
+            }
+            updateAllUI();
         }
 
-        // --- Iniciar Jogo ---
-        initialize();
+        function handleLoot(enemy) {
+            if (enemy.lootTable && enemy.lootTable.length > 0) {
+                enemy.lootTable.forEach(loot => {
+                    if (Math.random() < loot.chance) {
+                        addItemToInventory(loot.item);
+                    }
+                });
+            }
+        }
+        
+        // --- Geração de Inimigos e Bosses ---
 
+        function getRandomLowLevelEnemy() {
+            const lowLevelEnemies = [
+                gameData.enemies.giantRat,
+                gameData.enemies.caveBat,
+                gameData.enemies.smallSpider,
+                gameData.enemies.goblin
+            ];
+            return lowLevelEnemies[Math.floor(Math.random() * lowLevelEnemies.length)];
+        }
+
+        const bosses = {
+            ogreChieftain: { name: "Chefe Ogro", level: 5, hp: 150, maxHp: 150, attack: 25, defense: 8, lootTable: [{ item: "Poção de Cura Grande", chance: 1.0 }, { item: "Espada de Batalha", chance: 0.5 }], image: "https://placehold.co/100x100/666/FFF?text=Ogro+Chefe" },
+            darkSorcerer: { name: "Feiticeiro Sombrio", level: 7, hp: 120, maxHp: 120, attack: 30, defense: 5, lootTable: [{ item: "Cajado Mágico", chance: 0.5 }], image: "https://placehold.co/100x100/666/FFF?text=Feiticeiro" }
+        };
+
+        function getBoss() {
+            const availableBosses = Object.values(bosses);
+            return availableBosses[Math.floor(Math.random() * availableBosses.length)];
+        }
+
+        function checkBossSpawn() {
+            if (gameData.player.monstersSlain >= 30) {
+                logEvent("Uma aura poderosa surge! Um temível Chefe aparece!", 'important');
+                const boss = getBoss();
+                enterCombat(boss);
+                gameData.player.monstersSlain = 0; // Reseta o contador para o próximo boss
+            }
+        }
+
+
+        // --- Event Listeners ---
+        startGameBtn.addEventListener('click', startGame);
+        exploreButton.addEventListener('click', () => {
+            if (!gameData.inCombat) {
+                logEvent("Você explorou a caverna e encontrou um inimigo!");
+                const enemy = getRandomLowLevelEnemy();
+                enterCombat(enemy);
+            } else {
+                logEvent("Você já está em combate!", 'info');
+            }
+        });
+        attackButton.addEventListener('click', playerAttack);
+        abilityButton.addEventListener('click', useAbility);
+        fleeButton.addEventListener('click', fleeCombat);
+        modalOkBtn.addEventListener('click', () => gameModal.style.display = 'none'); // Default close for modal
+
+
+        // Inicialização
+        updateAllUI(); // Atualiza a UI inicial para refletir o estado do jogo (tela de início)
     </script>
 </body>
 </html>
