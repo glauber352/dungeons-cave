@@ -529,8 +529,6 @@
                 "Poção de Cura Grande": { type: "potion", effect: "heal", power: 50, consumable: true },
                 "Adaga Enferrujada": { type: "weapon", attackBonus: 5 },
                 "Espada Flamejante": { type: "weapon", attackBonus: 15 },
-
-                // Novos Itens Adicionados
                 "Cristal pútrido": { type: "component", description: "Um cristal escuro que emana energia necromântica." },
                 "Armadura corroída": { type: "armor", defenseBonus: 2, description: "Uma armadura gasta, mas que ainda oferece alguma proteção." },
                 "Fragmento de runa necromântica": { type: "component", description: "Um pequeno pedaço de uma runa que pulsa com magia da morte." },
