@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DUNGEONS CAVE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
@@ -203,6 +203,19 @@
             font-size: 0.8rem;
         }
 
+        /* Ajuste para o botão de usar item dentro do inventário */
+        .inventory-item .pixel-button {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.7rem;
+            box-shadow: 2px 2px #777;
+            border: 2px solid #555;
+        }
+
+        .inventory-item .pixel-button:hover {
+            transform: translateY(0);
+            box-shadow: 1px 1px #777;
+        }
+
         /* --- ESTILOS DA CENA DE COMBATE --- */
         #combat-scene {
             background-color: #5a7d3c;
@@ -316,7 +329,7 @@
         }
 
         #game-screen.in-combat .inventory-panel {
-             display: none; /* Esconde inventário na tela de combate */
+            display: none; /* Esconde inventário na tela de combate */
         }
     </style>
 </head>
@@ -348,7 +361,7 @@
             
             <!-- CENA DE COMBATE -->
             <div id="combat-scene">
-                 <div id="enemy-combat-area" class="combat-area">
+                <div id="enemy-combat-area" class="combat-area">
                     <div class="status-box">
                         <div class="name-level"><span id="combat-enemy-name"></span><span id="combat-enemy-level"></span></div>
                         <div class="hp-bar-container"><span class="hp-bar-label">HP</span><div class="hp-bar" id="combat-enemy-hp-bar"></div></div>
@@ -452,28 +465,36 @@
         // --- Objeto de Dados do Jogo ---
         const gameData = {
             inCombat: false,
-            player: { level: 1 },
+            player: { level: 1, inventory: [], monstersSlain: 0 }, // Inicialização básica
             currentEnemy: null,
             classes: {
-                knight: { name: "Cavaleiro", ability: "Escudo Imbatível", baseHp: 120, baseAttack: 15, baseDefense: 10, image: "image_f35a10.png" },
+                knight: { name: "Cavaleiro", ability: "Escudo Imbatível", baseHp: 120, baseAttack: 15, baseDefense: 10, image: "https://placehold.co/120x120/555/FFF?text=Cavaleiro" },
                 rogue: { name: "Ladino", ability: "Ataque Furtivo", baseHp: 80, baseAttack: 25, baseDefense: 5, image: "https://placehold.co/120x120/333/FFF?text=Ladino" },
                 mage: { name: "Mago", ability: "Tempestade Arcana", baseHp: 70, baseAttack: 30, baseDefense: 3, image: "https://placehold.co/120x120/333/FFF?text=Mago" },
             },
             enemies: {
-                giantRat: { name: "Rato Gigante", level: 1, hp: 15, maxHp: 15, attack: 4, defense: 1, lootTable: [{ item: "Poção de Cura Pequena", chance: 0.1 }], image: "https://placehold.co/100x100/666/FFF?text=Rato" },
-                caveBat: { name: "Morcego da Caverna", level: 1, hp: 18, maxHp: 18, attack: 5, defense: 1, lootTable: [], image: "https://placehold.co/100x100/666/FFF?text=Morcego" },
+                giantRat: { name: "Rato Gigante", level: 1, hp: 15, maxHp: 15, attack: 4, defense: 1, lootTable: [{ item: "Poção de Cura Pequena", chance: 0.3 }], image: "https://placehold.co/100x100/666/FFF?text=Rato" },
+                caveBat: { name: "Morcego da Caverna", level: 1, hp: 18, maxHp: 18, attack: 5, defense: 1, lootTable: [{ item: "Poção de Cura Pequena", chance: 0.1 }], image: "https://placehold.co/100x100/666/FFF?text=Morcego" },
                 smallSpider: { name: "Aranha Pequena", level: 2, hp: 22, maxHp: 22, attack: 6, defense: 2, lootTable: [{ item: "Poção de Cura Pequena", chance: 0.15 }], image: "https://placehold.co/100x100/666/FFF?text=Aranha" },
                 goblin: { name: "Goblin Ardiloso", level: 2, hp: 30, maxHp: 30, attack: 8, defense: 2, lootTable: [{ item: "Poção de Cura Pequena", chance: 0.3 }], image: "https://placehold.co/100x100/666/FFF?text=Goblin" },
-                orc: { name: "Orc Brutal", level: 3, hp: 50, maxHp: 50, attack: 12, defense: 4, lootTable: [{ item: "Adaga Enferrujada", chance: 0.2 }], image: "https://placehold.co/100x100/666/FFF?text=Orc" },
+                orc: { name: "Orc Brutal", level: 3, hp: 50, maxHp: 50, attack: 12, defense: 4, lootTable: [{ item: "Adaga Enferrujada", chance: 0.5 }], image: "https://placehold.co/100x100/666/FFF?text=Orc" },
+                caveBoss: { name: "Boss da Caverna", level: 5, hp: 150, maxHp: 150, attack: 20, defense: 8, lootTable: [{ item: "Poção de Cura Grande", chance: 1.0 }, { item: "Espada Flamejante", chance: 0.7 }], image: "https://placehold.co/120x120/800/FFF?text=BOSS" },
             },
             items: {
                 "Poção de Cura Pequena": { type: "potion", effect: "heal", power: 20, consumable: true },
-                "Adaga Enferrujada": { type: "weapon", attackBonus: 2 },
+                "Poção de Cura Grande": { type: "potion", effect: "heal", power: 50, consumable: true },
+                "Adaga Enferrujada": { type: "weapon", attackBonus: 5 },
+                "Espada Flamejante": { type: "weapon", attackBonus: 15 },
             }
         };
 
         // --- Funções de UI ---
 
+        /**
+         * Exibe um modal com uma mensagem e um botão "OK".
+         * @param {string} message - A mensagem a ser exibida no modal.
+         * @param {Function} [onOkCallback] - Função opcional a ser executada ao clicar em OK.
+         */
         function showModal(message, onOkCallback = null) {
             modalMessage.textContent = message;
             gameModal.style.display = 'block';
@@ -483,6 +504,11 @@
             };
         }
 
+        /**
+         * Adiciona uma mensagem ao registro de eventos do jogo.
+         * @param {string} message - A mensagem a ser logada.
+         * @param {string} [type='normal'] - O tipo de mensagem para aplicar estilos CSS (e.g., 'combat', 'player_damage', 'heal').
+         */
         function logEvent(message, type = 'normal') {
             const p = document.createElement('p');
             p.textContent = message;
@@ -490,13 +516,14 @@
                 important: 'text-yellow-400', combat: 'text-red-400',
                 player_damage: 'text-red-400', enemy_damage: 'text-orange-400',
                 heal: 'text-green-400', success: 'text-green-400',
-                info: 'text-blue-300'
+                info: 'text-blue-300', error: 'text-red-500' // Adicionado tipo 'error'
             };
             if(classMap[type]) p.classList.add(...classMap[type].split(' '));
             gameLogDiv.appendChild(p);
-            gameLogDiv.scrollTop = gameLogDiv.scrollHeight;
+            gameLogDiv.scrollTop = gameLogDiv.scrollHeight; // Rola para o final
         }
 
+        /** Atualiza todos os elementos da interface do usuário do jogo. */
         function updateAllUI() {
             updatePlayerStats();
             updateEnemyInfo();
@@ -505,52 +532,71 @@
             updateActionButtons();
         }
 
+        /** Atualiza as estatísticas do jogador na interface padrão. */
         function updatePlayerStats() {
             const player = gameData.player;
-            if(!player.name) return;
+            if(!player.name) return; // Garante que o jogador está inicializado
             const totalAttack = player.attack + (player.equippedWeapon?.attackBonus || 0);
             playerStatsDiv.innerHTML = `
                 <span>${player.name} Nv.${player.level}</span>
                 <span>HP: ${player.hp}/${player.maxHp}</span>
                 <span>Ataque: ${totalAttack}</span>
                 <span>Defesa: ${player.defense}</span>
+                <span>XP: ${player.xp}/${player.xpToNextLevel}</span>
+                <span>Ouro: ${player.gold}</span>
+                <span>Monstros Abatidos: ${player.monstersSlain}</span>
+                ${player.equippedWeapon ? `<span>Arma: ${player.equippedWeapon.name}</span>` : '<span>Arma: Nenhuma</span>'}
             `;
         }
 
+        /** Atualiza as informações do inimigo na interface padrão. */
         function updateEnemyInfo() {
-             const enemy = gameData.currentEnemy;
-             if(enemy && !gameData.inCombat) {
-                 enemyNameSpan.textContent = `${enemy.name}`;
-                 enemyHpSpan.textContent = `HP: ${enemy.hp}`;
-             } else {
-                 enemyNameSpan.textContent = "Nenhum";
-                 enemyHpSpan.textContent = "HP: --";
-             }
+            const enemy = gameData.currentEnemy;
+            if(enemy && !gameData.inCombat) {
+                enemyNameSpan.textContent = `${enemy.name}`;
+                enemyHpSpan.textContent = `HP: ${enemy.hp}/${enemy.maxHp}`;
+            } else {
+                enemyNameSpan.textContent = "Nenhum";
+                enemyHpSpan.textContent = "HP: --";
+            }
         }
         
+        /** Atualiza a interface do usuário durante o combate. */
         function updateCombatUI() {
             if (!gameData.inCombat) return;
             const player = gameData.player;
             const enemy = gameData.currentEnemy;
 
             combatPlayerName.textContent = player.name;
-            combatPlayerLevel.textContent = `Nv${player.level}`;
+            combatPlayerLevel.textContent = `Nv.${player.level}`;
             updateHealthBar(combatPlayerHpBar, player.hp, player.maxHp);
             combatPlayerHpText.textContent = `${player.hp} / ${player.maxHp}`;
 
             combatEnemyName.textContent = enemy.name;
-            combatEnemyLevel.textContent = `Nv${enemy.level}`;
+            combatEnemyLevel.textContent = `Nv.${enemy.level}`;
             updateHealthBar(combatEnemyHpBar, enemy.hp, enemy.maxHp);
         }
 
+        /**
+         * Atualiza a largura e a cor de uma barra de vida.
+         * @param {HTMLElement} barElement - O elemento da barra de vida (div).
+         * @param {number} current - A vida atual.
+         * @param {number} max - A vida máxima.
+         */
         function updateHealthBar(barElement, current, max) {
             const percentage = Math.max(0, (current / max) * 100);
             barElement.style.width = `${percentage}%`;
             barElement.classList.remove('green', 'yellow', 'red');
-            if (percend('yellow');
-            else barElement.classList.add('green');
+            if (percentage <= 20) {
+                barElement.classList.add('red');
+            } else if (percentage <= 50) {
+                barElement.classList.add('yellow');
+            } else {
+                barElement.classList.add('green');
+            }
         }
 
+        /** Habilita/desabilita botões de ação com base no estado de combate e atualiza a visibilidade das seções do jogo. */
         function updateActionButtons() {
             const inCombat = gameData.inCombat;
             exploreButton.disabled = inCombat;
@@ -568,6 +614,7 @@
             }
         }
 
+        /** Renderiza o inventário do jogador. */
         function renderInventory() {
             inventoryDiv.innerHTML = '';
             if (gameData.player.inventory.length === 0) {
@@ -594,12 +641,14 @@
 
         // --- Funções de Jogo ---
 
+        /** Inicia o jogo, mostrando a tela de seleção de classe. */
         function startGame() {
             startScreen.style.display = 'none';
             classSelectionModal.style.display = 'block';
             renderClassSelection();
         }
 
+        /** Renderiza as opções de seleção de classe no modal. */
         function renderClassSelection() {
             classSelectionModal.innerHTML = `
                 <h2 class="text-xl mb-4">Escolha sua Classe</h2>
@@ -616,6 +665,10 @@
             });
         }
 
+        /**
+         * Seleciona a classe do jogador e inicializa seus atributos.
+         * @param {string} classId - O ID da classe selecionada.
+         */
         function selectClass(classId) {
             const selectedClass = gameData.classes[classId];
             gameData.player = {
@@ -632,16 +685,20 @@
                 gold: 0,
                 inventory: [],
                 equippedWeapon: null,
-                monstersSlain: 0, // Contador de monstros abatidos
+                monstersSlain: 0, 
                 image: selectedClass.image
             };
             logEvent(`Você escolheu ser um ${selectedClass.name}!`, 'success');
             classSelectionModal.style.display = 'none';
             gameScreen.style.display = 'flex';
-            playerSprite.src = selectedClass.image;
+            playerSprite.src = selectedClass.image; // Define o sprite do jogador
             updateAllUI();
         }
         
+        /**
+         * Concede experiência ao jogador.
+         * @param {number} amount - A quantidade de XP a ser concedida.
+         */
         function gainXp(amount) {
             gameData.player.xp += amount;
             logEvent(`Você ganhou ${amount} de XP!`, 'info');
@@ -651,11 +708,12 @@
             updateAllUI();
         }
 
+        /** Aumenta o nível do jogador. */
         function levelUp() {
             const player = gameData.player;
             player.level++;
             player.xp -= player.xpToNextLevel;
-            player.xpToNextLevel = Math.floor(player.xpToNextLevel * 1.5);
+            player.xpToNextLevel = Math.floor(player.xpToNextLevel * 1.5); // Aumenta o XP necessário para o próximo nível
             player.maxHp += 15; // Ganho de HP por nível
             player.hp = player.maxHp; // Cura total ao subir de nível
             player.attack += 3; // Ganho de Ataque por nível
@@ -664,6 +722,11 @@
             showModal(`Parabéns! Você alcançou o Nível ${player.level}!`, updateAllUI);
         }
 
+        /**
+         * Adiciona um item ao inventário do jogador.
+         * @param {string} itemName - O nome do item a ser adicionado.
+         * @param {number} [quantity=1] - A quantidade do item.
+         */
         function addItemToInventory(itemName, quantity = 1) {
             const existingItem = gameData.player.inventory.find(item => item.name === itemName);
             if (existingItem) {
@@ -675,6 +738,12 @@
             renderInventory();
         }
 
+        /**
+         * Remove um item do inventário do jogador.
+         * @param {string} itemName - O nome do item a ser removido.
+         * @param {number} [quantity=1] - A quantidade do item.
+         * @returns {boolean} - True se o item foi removido com sucesso, false caso contrário.
+         */
         function removeItemFromInventory(itemName, quantity = 1) {
             const itemIndex = gameData.player.inventory.findIndex(item => item.name === itemName);
             if (itemIndex > -1) {
@@ -688,6 +757,10 @@
             return false;
         }
 
+        /**
+         * Usa um item do inventário.
+         * @param {string} itemName - O nome do item a ser usado.
+         */
         function useItem(itemName) {
             const itemInfo = gameData.items[itemName];
             const player = gameData.player;
@@ -708,12 +781,13 @@
                 removeItemFromInventory(itemName);
                 updateAllUI();
             } else if (itemInfo.type === "weapon") {
-                if (player.equippedWeapon && player.equippedWeapon.name === itemName) {
-                    logEvent(`Você já está usando ${itemName}.`, 'info');
-                    return;
-                }
-                // Desequipa a arma atual, se houver
+                // Se já houver uma arma equipada, guarda-a de volta no inventário
                 if (player.equippedWeapon) {
+                    // Verifica se a arma que o jogador está tentando equipar é a mesma que já está equipada
+                    if (player.equippedWeapon.name === itemName) {
+                        logEvent(`Você já está usando ${itemName}.`, 'info');
+                        return;
+                    }
                     addItemToInventory(player.equippedWeapon.name);
                     logEvent(`Você guardou sua ${player.equippedWeapon.name}.`, 'info');
                 }
@@ -728,15 +802,22 @@
         }
 
         // --- Lógica de Combate ---
+
+        /**
+         * Inicia um combate com um inimigo.
+         * @param {Object} enemy - O objeto do inimigo.
+         */
         function enterCombat(enemy) {
             gameData.inCombat = true;
-            gameData.currentEnemy = { ...enemy }; // Clona o inimigo para não alterar o original
+            // Clona o inimigo para não alterar o objeto original na gameData.enemies
+            gameData.currentEnemy = { ...enemy }; 
             logEvent(`Você encontrou um(a) ${enemy.name}! Prepare-se para a batalha!`, 'combat');
             enemySprite.src = enemy.image;
-            playerSprite.src = gameData.player.image;
+            playerSprite.src = gameData.player.image; // Garante que o sprite do jogador esteja visível
             updateAllUI();
         }
 
+        /** Encerra o combate. */
         function endCombat() {
             gameData.inCombat = false;
             gameData.currentEnemy = null;
@@ -744,6 +825,7 @@
             logEvent("O combate terminou.", 'info');
         }
 
+        /** Lógica de ataque do jogador. */
         function playerAttack() {
             if (!gameData.inCombat) return;
 
@@ -751,7 +833,7 @@
             const enemy = gameData.currentEnemy;
             
             const totalPlayerAttack = player.attack + (player.equippedWeapon?.attackBonus || 0);
-            let damage = Math.max(0, totalPlayerAttack - enemy.defense);
+            let damage = Math.max(1, totalPlayerAttack - enemy.defense); // Garante no mínimo 1 de dano
             
             enemy.hp -= damage;
             logEvent(`${player.name} atacou ${enemy.name} causando ${damage} de dano!`, 'player_damage');
@@ -759,24 +841,28 @@
             if (enemy.hp <= 0) {
                 enemy.hp = 0; // Garante que a HP não seja negativa na UI
                 logEvent(`${enemy.name} foi derrotado!`, 'success');
-                gameData.player.monstersSlain++; // Incrementa o contador
-                gainXp(enemy.level * 20); // Exemplo de XP
-                handleLoot(enemy);
+                gameData.player.monstersSlain++; // Incrementa o contador de monstros abatidos
+                gainXp(enemy.level * 20 + (enemy.name.includes("Boss") ? 100 : 0)); // Exemplo de XP, mais XP para bosses
+                gameData.player.gold += enemy.level * 5 + Math.floor(Math.random() * 10); // Ganho de ouro
+                logEvent(`Você encontrou ${enemy.level * 5 + Math.floor(Math.random() * 10)} de ouro.`, 'info');
+                handleLoot(enemy); // Lida com o saque do inimigo
                 endCombat();
                 checkBossSpawn(); // Verifica se é hora de aparecer um boss
             } else {
-                enemyTurn();
+                // Se o inimigo ainda estiver vivo, é a vez dele atacar
+                setTimeout(enemyTurn, 700); // Pequeno atraso para a mensagem do jogador aparecer
             }
             updateAllUI();
         }
 
+        /** Lógica de ataque do inimigo. */
         function enemyTurn() {
             if (!gameData.inCombat) return;
 
             const player = gameData.player;
             const enemy = gameData.currentEnemy;
 
-            let damage = Math.max(0, enemy.attack - player.defense);
+            let damage = Math.max(1, enemy.attack - player.defense); // Garante no mínimo 1 de dano
             player.hp -= damage;
             logEvent(`${enemy.name} atacou ${player.name} causando ${damage} de dano!`, 'enemy_damage');
 
@@ -788,6 +874,9 @@
             updateAllUI();
         }
 
+        /**
+         * Usa a habilidade especial do jogador com base em sua classe.
+         */
         function useAbility() {
             const player = gameData.player;
             const enemy = gameData.currentEnemy;
@@ -801,9 +890,8 @@
 
             switch (player.class) {
                 case 'knight':
-                    // Cavaleiro: Aumenta a defesa temporariamente ou reflete dano
-                    logEvent("Seu Escudo Imbatível o protege!", 'info');
-                    const defenseBoost = 5;
+                    // Cavaleiro: Aumenta a defesa temporariamente
+                    const defenseBoost = 5 + Math.floor(player.level / 2);
                     const originalDefense = player.defense;
                     player.defense += defenseBoost;
                     logEvent(`Sua defesa aumentou em ${defenseBoost} por um turno!`, 'success');
@@ -815,115 +903,109 @@
                             logEvent("O efeito do Escudo Imbatível passou.", 'info');
                             updateAllUI();
                         }
-                    }, 1000); // Pequeno atraso para o log aparecer antes do inimigo atacar
+                    }, 800); // Pequeno atraso para o log aparecer antes do inimigo atacar
                     break;
                 case 'rogue':
-                    // Ladino: Grande dano ou chance de crítico
-                    let stealthDamage = player.attack * 2;
+                    // Ladino: Grande dano crítico
+                    let stealthDamage = Math.floor((player.attack + (player.equippedWeapon?.attackBonus || 0)) * 1.8); // 180% de dano
                     enemy.hp -= stealthDamage;
                     logEvent(`Seu Ataque Furtivo causou ${stealthDamage} de dano crítico!`, 'player_damage');
                     break;
                 case 'mage':
-                    // Mago: Dano em área (se tiver múltiplos inimigos) ou dano mágico alto
-                    let arcaneDamage = player.attack * 1.5;
+                    // Mago: Dano mágico alto
+                    let arcaneDamage = Math.floor((player.attack + (player.equippedWeapon?.attackBonus || 0)) * 1.5); // 150% de dano mágico
                     enemy.hp -= arcaneDamage;
                     logEvent(`Sua Tempestade Arcana atingiu ${enemy.name} causando ${arcaneDamage} de dano mágico!`, 'player_damage');
                     break;
                 default:
-                    logEvent("Habilidade desconhecida.", 'error');
+                    logEvent("Esta classe não tem uma habilidade definida.", 'error');
+                    break;
             }
-
-            if (enemy.hp <= 0) {
-                enemy.hp = 0;
-                logEvent(`${enemy.name} foi derrotado!`, 'success');
-                gameData.player.monstersSlain++;
-                gainXp(enemy.level * 20);
-                handleLoot(enemy);
-                endCombat();
-                checkBossSpawn();
+            // Após a habilidade, é a vez do inimigo (se ainda estiver vivo)
+            if (gameData.currentEnemy.hp <= 0) {
+                 gameData.currentEnemy.hp = 0;
+                 logEvent(`${gameData.currentEnemy.name} foi derrotado!`, 'success');
+                 gameData.player.monstersSlain++;
+                 gainXp(gameData.currentEnemy.level * 20 + (gameData.currentEnemy.name.includes("Boss") ? 100 : 0));
+                 gameData.player.gold += gameData.currentEnemy.level * 5 + Math.floor(Math.random() * 10);
+                 logEvent(`Você encontrou ${gameData.currentEnemy.level * 5 + Math.floor(Math.random() * 10)} de ouro.`, 'info');
+                 handleLoot(gameData.currentEnemy);
+                 endCombat();
+                 checkBossSpawn();
             } else {
-                enemyTurn();
+                setTimeout(enemyTurn, 700);
             }
             updateAllUI();
         }
 
+        /** Tenta fugir do combate. */
         function fleeCombat() {
-            if (!gameData.inCombat) {
-                logEvent("Você não está em combate para fugir.", 'info');
-                return;
-            }
-            const fleeChance = Math.random();
-            if (fleeChance > 0.5) { // 50% de chance de fuga
-                logEvent("Você conseguiu fugir do combate!", 'info');
+            if (!gameData.inCombat) return;
+
+            // Chance de fuga (e.g., 50%)
+            const fleeChance = 0.5;
+            if (Math.random() < fleeChance) {
+                logEvent("Você conseguiu fugir do combate!", 'success');
                 endCombat();
             } else {
                 logEvent("Você falhou em fugir!", 'combat');
-                enemyTurn(); // Inimigo ataca se a fuga falhar
+                setTimeout(enemyTurn, 700); // Inimigo ataca após a falha de fuga
             }
             updateAllUI();
         }
 
-        function handleLoot(enemy) {
-            if (enemy.lootTable && enemy.lootTable.length > 0) {
-                enemy.lootTable.forEach(loot => {
-                    if (Math.random() < loot.chance) {
-                        addItemToInventory(loot.item);
+        /**
+         * Lida com o saque de itens após derrotar um inimigo.
+         * @param {Object} defeatedEnemy - O inimigo derrotado.
+         */
+        function handleLoot(defeatedEnemy) {
+            if (defeatedEnemy.lootTable && defeatedEnemy.lootTable.length > 0) {
+                defeatedEnemy.lootTable.forEach(drop => {
+                    if (Math.random() < drop.chance) {
+                        addItemToInventory(drop.item);
                     }
+                });
+            } else {
+                logEvent(`${defeatedEnemy.name} não deixou nenhum item.`, 'info');
+            }
+        }
+
+        /** Simula a exploração da caverna, podendo encontrar um inimigo. */
+        function explore() {
+            logEvent("Você explora as profundezas da caverna...", 'info');
+            const enemiesList = Object.values(gameData.enemies).filter(e => !e.name.includes("Boss")); // Exclui bosses da exploração normal
+            
+            // 70% de chance de encontrar um inimigo, 30% de chance de não encontrar nada
+            if (Math.random() < 0.7) {
+                const randomEnemy = enemiesList[Math.floor(Math.random() * enemiesList.length)];
+                enterCombat(randomEnemy);
+            } else {
+                logEvent("Você não encontrou nada interessante.", 'info');
+            }
+        }
+
+        /** Verifica se as condições para o surgimento de um chefe foram atendidas. */
+        function checkBossSpawn() {
+            const player = gameData.player;
+            // Exemplo: Boss aparece após 5 monstros comuns abatidos
+            if (player.monstersSlain >= 5 && !gameData.enemies.caveBoss.isSpawned) {
+                logEvent("Uma presença sombria e poderosa se aproxima!", 'important');
+                showModal("Você sente um tremor na caverna... Algo GRANDE está vindo!", () => {
+                    enterCombat(gameData.enemies.caveBoss);
+                    gameData.enemies.caveBoss.isSpawned = true; // Marca o boss como "spawnado"
                 });
             }
         }
-        
-        // --- Geração de Inimigos e Bosses ---
-
-        function getRandomLowLevelEnemy() {
-            const lowLevelEnemies = [
-                gameData.enemies.giantRat,
-                gameData.enemies.caveBat,
-                gameData.enemies.smallSpider,
-                gameData.enemies.goblin
-            ];
-            return lowLevelEnemies[Math.floor(Math.random() * lowLevelEnemies.length)];
-        }
-
-        const bosses = {
-            ogreChieftain: { name: "Chefe Ogro", level: 5, hp: 150, maxHp: 150, attack: 25, defense: 8, lootTable: [{ item: "Poção de Cura Grande", chance: 1.0 }, { item: "Espada de Batalha", chance: 0.5 }], image: "https://placehold.co/100x100/666/FFF?text=Ogro+Chefe" },
-            darkSorcerer: { name: "Feiticeiro Sombrio", level: 7, hp: 120, maxHp: 120, attack: 30, defense: 5, lootTable: [{ item: "Cajado Mágico", chance: 0.5 }], image: "https://placehold.co/100x100/666/FFF?text=Feiticeiro" }
-        };
-
-        function getBoss() {
-            const availableBosses = Object.values(bosses);
-            return availableBosses[Math.floor(Math.random() * availableBosses.length)];
-        }
-
-        function checkBossSpawn() {
-            if (gameData.player.monstersSlain >= 30) {
-                logEvent("Uma aura poderosa surge! Um temível Chefe aparece!", 'important');
-                const boss = getBoss();
-                enterCombat(boss);
-                gameData.player.monstersSlain = 0; // Reseta o contador para o próximo boss
-            }
-        }
-
 
         // --- Event Listeners ---
         startGameBtn.addEventListener('click', startGame);
-        exploreButton.addEventListener('click', () => {
-            if (!gameData.inCombat) {
-                logEvent("Você explorou a caverna e encontrou um inimigo!");
-                const enemy = getRandomLowLevelEnemy();
-                enterCombat(enemy);
-            } else {
-                logEvent("Você já está em combate!", 'info');
-            }
-        });
+        exploreButton.addEventListener('click', explore);
         attackButton.addEventListener('click', playerAttack);
         abilityButton.addEventListener('click', useAbility);
         fleeButton.addEventListener('click', fleeCombat);
-        modalOkBtn.addEventListener('click', () => gameModal.style.display = 'none'); // Default close for modal
 
-
-        // Inicialização
-        updateAllUI(); // Atualiza a UI inicial para refletir o estado do jogo (tela de início)
+        // Inicializa a UI ao carregar
+        updateAllUI();
     </script>
 </body>
 </html>
