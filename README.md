@@ -216,34 +216,32 @@
         .combat-area {
             position: absolute;
             width: 45%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         
         #enemy-combat-area {
             top: 20px;
             right: 20px;
-            text-align: right;
+            align-items: flex-end;
         }
         
         #player-combat-area {
-            bottom: 20px; /* Posição ajustada */
+            bottom: 20px;
             left: 20px;
+            align-items: flex-start;
         }
 
-        .sprite-placeholder {
-            height: 100px;
-            width: 100px;
-            background-color: rgba(0,0,0,0.2);
-            border: 2px dashed #1a242f;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 0.7rem;
+        .sprite {
+            height: 120px;
+            width: auto;
+            image-rendering: pixelated;
             margin-bottom: 10px;
         }
         
-        #player-combat-area .sprite-placeholder {
-            height: 120px;
-            width: 120px;
+        #enemy-sprite {
+            height: 100px;
         }
 
         .status-box {
@@ -255,6 +253,7 @@
             font-size: 0.8rem;
             box-shadow: 3px 3px #1a242f;
             text-align: left;
+            width: 100%;
         }
 
         .status-box .name-level {
@@ -340,26 +339,26 @@
 
         <!-- MODAL DE SELEÇÃO DE CLASSE -->
         <div id="class-selection-modal" class="modal">
-            <!-- Conteúdo do modal de classe (tabela, etc.) aqui -->
+            <!-- Conteúdo é gerado via JS -->
         </div>
 
         <!-- TELA PRINCIPAL DO JOGO -->
         <div id="game-screen">
             <h2 id="screen-title" class="text-2xl">Aventura em Andamento!</h2>
             
-            <!-- CENA DE COMBATE (visível quando game-screen tem a classe 'in-combat') -->
+            <!-- CENA DE COMBATE -->
             <div id="combat-scene">
                  <div id="enemy-combat-area" class="combat-area">
-                    <div class="status-box" id="enemy-status-box">
+                    <div class="status-box">
                         <div class="name-level"><span id="combat-enemy-name"></span><span id="combat-enemy-level"></span></div>
                         <div class="hp-bar-container"><span class="hp-bar-label">HP</span><div class="hp-bar" id="combat-enemy-hp-bar"></div></div>
                     </div>
-                    <div class="sprite-placeholder">INIMIGO</div>
+                    <img id="enemy-sprite" class="sprite" src="" alt="Inimigo">
                 </div>
 
                 <div id="player-combat-area" class="combat-area">
-                     <div class="sprite-placeholder">HERÓI</div>
-                    <div class="status-box" id="player-status-box">
+                    <img id="player-sprite" class="sprite" src="" alt="Herói">
+                    <div class="status-box">
                        <div class="name-level"><span id="combat-player-name"></span><span id="combat-player-level"></span></div>
                         <div class="hp-bar-container"><span class="hp-bar-label">HP</span><div class="hp-bar" id="combat-player-hp-bar"></div></div>
                         <div id="combat-player-hp-text"></div>
@@ -367,7 +366,7 @@
                 </div>
             </div>
 
-            <!-- VISÃO PADRÃO/EXPLORAÇÃO (visível quando game-screen não tem a classe 'in-combat') -->
+            <!-- VISÃO PADRÃO/EXPLORAÇÃO -->
             <div id="default-view">
                 <div class="stats-area">
                     <div class="panel player-panel">
@@ -384,7 +383,7 @@
                 </div>
             </div>
             
-            <!-- PAINÉIS DE LOG, AÇÕES E INVENTÁRIO (sempre visíveis, mas layout muda) -->
+            <!-- PAINÉIS DE LOG, AÇÕES E INVENTÁRIO -->
             <div class="panel log-panel">
                 <h3>Registro de Eventos</h3>
                 <div id="game-log" class="game-log">
@@ -415,22 +414,18 @@
         // --- Referências aos Elementos do DOM ---
         const getEl = (id) => document.getElementById(id);
 
-        const gameContainer = getEl('game-container');
+        const gameScreen = getEl('game-screen');
         const startScreen = getEl('start-screen');
         const classSelectionModal = getEl('class-selection-modal');
-        const gameScreen = getEl('game-screen');
         const gameModal = getEl('game-modal');
         const startGameBtn = getEl('start-game-button');
         const screenTitle = getEl('screen-title');
 
-        // Visão Padrão
-        const defaultView = getEl('default-view');
-        const playerStatsDiv = getEl('player-stats');
-        const enemyNameSpan = getEl('enemy-name');
-        const enemyHpSpan = getEl('enemy-hp');
+        // Sprites de Combate
+        const playerSprite = getEl('player-sprite');
+        const enemySprite = getEl('enemy-sprite');
         
-        // Cena de Combate
-        const combatScene = getEl('combat-scene');
+        // UI de Combate
         const combatPlayerName = getEl('combat-player-name');
         const combatPlayerLevel = getEl('combat-player-level');
         const combatPlayerHpBar = getEl('combat-player-hp-bar');
@@ -439,6 +434,11 @@
         const combatEnemyLevel = getEl('combat-enemy-level');
         const combatEnemyHpBar = getEl('combat-enemy-hp-bar');
         
+        // UI Padrão
+        const playerStatsDiv = getEl('player-stats');
+        const enemyNameSpan = getEl('enemy-name');
+        const enemyHpSpan = getEl('enemy-hp');
+
         // Elementos Compartilhados
         const gameLogDiv = getEl('game-log');
         const inventoryDiv = getEl('inventory');
@@ -455,18 +455,16 @@
             player: { level: 1 },
             currentEnemy: null,
             classes: {
-                knight: { name: "Cavaleiro", ability: "Escudo Imbatível", baseHp: 120, baseAttack: 15, baseDefense: 10 },
-                rogue: { name: "Ladino", ability: "Ataque Furtivo", baseHp: 80, baseAttack: 25, baseDefense: 5 },
-                mage: { name: "Mago", ability: "Tempestade Arcana", baseHp: 70, baseAttack: 30, baseDefense: 3 },
+                knight: { name: "Cavaleiro", ability: "Escudo Imbatível", baseHp: 120, baseAttack: 15, baseDefense: 10, image: "image_f35a10.png" },
+                rogue: { name: "Ladino", ability: "Ataque Furtivo", baseHp: 80, baseAttack: 25, baseDefense: 5, image: "https://placehold.co/120x120/333/FFF?text=Ladino" },
+                mage: { name: "Mago", ability: "Tempestade Arcana", baseHp: 70, baseAttack: 30, baseDefense: 3, image: "https://placehold.co/120x120/333/FFF?text=Mago" },
             },
             enemies: {
-                // NOVOS MONSTROS FRACOS
-                giantRat: { name: "Rato Gigante", level: 1, hp: 15, maxHp: 15, attack: 4, defense: 1, lootTable: [{ item: "Poção de Cura Pequena", chance: 0.1 }] },
-                caveBat: { name: "Morcego da Caverna", level: 1, hp: 18, maxHp: 18, attack: 5, defense: 1, lootTable: [] },
-                smallSpider: { name: "Aranha Pequena", level: 2, hp: 22, maxHp: 22, attack: 6, defense: 2, lootTable: [{ item: "Poção de Cura Pequena", chance: 0.15 }] },
-                // Monstros existentes
-                goblin: { name: "Goblin Ardiloso", level: 2, hp: 30, maxHp: 30, attack: 8, defense: 2, lootTable: [{ item: "Poção de Cura Pequena", chance: 0.3 }] },
-                orc: { name: "Orc Brutal", level: 3, hp: 50, maxHp: 50, attack: 12, defense: 4, lootTable: [{ item: "Adaga Enferrujada", chance: 0.2 }] },
+                giantRat: { name: "Rato Gigante", level: 1, hp: 15, maxHp: 15, attack: 4, defense: 1, lootTable: [{ item: "Poção de Cura Pequena", chance: 0.1 }], image: "https://placehold.co/100x100/666/FFF?text=Rato" },
+                caveBat: { name: "Morcego da Caverna", level: 1, hp: 18, maxHp: 18, attack: 5, defense: 1, lootTable: [], image: "https://placehold.co/100x100/666/FFF?text=Morcego" },
+                smallSpider: { name: "Aranha Pequena", level: 2, hp: 22, maxHp: 22, attack: 6, defense: 2, lootTable: [{ item: "Poção de Cura Pequena", chance: 0.15 }], image: "https://placehold.co/100x100/666/FFF?text=Aranha" },
+                goblin: { name: "Goblin Ardiloso", level: 2, hp: 30, maxHp: 30, attack: 8, defense: 2, lootTable: [{ item: "Poção de Cura Pequena", chance: 0.3 }], image: "https://placehold.co/100x100/666/FFF?text=Goblin" },
+                orc: { name: "Orc Brutal", level: 3, hp: 50, maxHp: 50, attack: 12, defense: 4, lootTable: [{ item: "Adaga Enferrujada", chance: 0.2 }], image: "https://placehold.co/100x100/666/FFF?text=Orc" },
             },
             items: {
                 "Poção de Cura Pequena": { type: "potion", effect: "heal", power: 20, consumable: true },
@@ -510,7 +508,7 @@
         function updatePlayerStats() {
             const player = gameData.player;
             if(!player.name) return;
-            const totalAttack = player.attack + (player.equippedWeapon ? player.equippedWeapon.attackBonus : 0);
+            const totalAttack = player.attack + (player.equippedWeapon?.attackBonus || 0);
             playerStatsDiv.innerHTML = `
                 <span>${player.name} Nv.${player.level}</span>
                 <span>HP: ${player.hp}/${player.maxHp}</span>
@@ -521,7 +519,6 @@
 
         function updateEnemyInfo() {
              const enemy = gameData.currentEnemy;
-             // Este painel só é visível fora de combate
              if(enemy && !gameData.inCombat) {
                  enemyNameSpan.textContent = `${enemy.name}`;
                  enemyHpSpan.textContent = `HP: ${enemy.hp}`;
@@ -591,8 +588,11 @@
             player.attack = cls.baseAttack;
             player.defense = cls.baseDefense;
             player.abilityName = cls.ability;
+            player.image = cls.image; // Guarda a URL da imagem
             player.inventory = ["Poção de Cura Pequena"];
 
+            playerSprite.src = player.image; // Define a imagem do jogador
+            
             classSelectionModal.style.display = 'none';
             startScreen.style.display = 'none';
             gameScreen.style.display = 'flex';
@@ -603,7 +603,6 @@
 
         function explore() {
             logEvent("Você explora a masmorra...", 'info');
-            // 50% de chance de encontrar um inimigo
             if (Math.random() > 0.5) {
                 logEvent("...mas não encontra nada.", 'info');
                 return;
@@ -615,9 +614,11 @@
 
         function startCombat(enemyKey) {
             const enemyTemplate = gameData.enemies[enemyKey];
-            gameData.currentEnemy = { ...enemyTemplate }; // Clona o inimigo
+            gameData.currentEnemy = { ...enemyTemplate };
             gameData.player.specialAbilityUsedThisCombat = false;
             gameData.inCombat = true;
+            
+            enemySprite.src = gameData.currentEnemy.image; // Define a imagem do inimigo
             
             gameScreen.classList.add('in-combat');
             screenTitle.textContent = "EM COMBATE!";
@@ -640,6 +641,7 @@
 
             gameData.inCombat = false;
             gameData.currentEnemy = null;
+            enemySprite.src = ""; // Limpa a imagem do inimigo
             gameScreen.classList.remove('in-combat');
             screenTitle.textContent = "Aventura em Andamento!";
             updateAllUI();
@@ -686,7 +688,7 @@
         function useSpecialAbility() {
              const player = gameData.player;
              logEvent(`${player.name} usa ${player.abilityName}!`, 'success');
-             player.defense += 5; // Exemplo simples de buff de defesa
+             player.defense += 5;
              logEvent("Sua defesa aumentou temporariamente!", 'info');
              player.specialAbilityUsedThisCombat = true;
 
