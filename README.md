@@ -347,10 +347,10 @@
         <div id="start-screen">
             <h1>DUNGEONS CAVE</h1>
             <p class="text-center italic mb-4">"Aventure-se nas profundezas... se tiver coragem."</p>
-            <button id="start-game-button" class="pixel-button mt-6">Escolher Classe</button>
+            <button id="start-game-button" class="pixel-button mt-6">Iniciar Jogo</button>
         </div>
 
-        <!-- MODAL DE SELEÇÃO DE CLASSE -->
+        <!-- MODAL DE SELEÇÃO DE CLASSE (Agora não será exibido, mas o HTML permanece) -->
         <div id="class-selection-modal" class="modal">
             <!-- Conteúdo é gerado via JS -->
         </div>
@@ -641,14 +641,20 @@
 
         // --- Funções de Jogo ---
 
-        /** Inicia o jogo, mostrando a tela de seleção de classe. */
+        /**
+         * Inicia o jogo, selecionando uma classe padrão automaticamente.
+         * A tela de seleção de classe é pulada.
+         */
         function startGame() {
             startScreen.style.display = 'none';
-            classSelectionModal.style.display = 'block';
-            renderClassSelection();
+            // Seleciona a classe "knight" (Cavaleiro) automaticamente
+            selectClass('knight'); 
         }
 
-        /** Renderiza as opções de seleção de classe no modal. */
+        /**
+         * Renderiza as opções de seleção de classe no modal.
+         * (Esta função não será mais chamada com a seleção automática, mas é mantida por completude).
+         */
         function renderClassSelection() {
             classSelectionModal.innerHTML = `
                 <h2 class="text-xl mb-4">Escolha sua Classe</h2>
@@ -689,8 +695,8 @@
                 image: selectedClass.image
             };
             logEvent(`Você escolheu ser um ${selectedClass.name}!`, 'success');
-            classSelectionModal.style.display = 'none';
-            gameScreen.style.display = 'flex';
+            classSelectionModal.style.display = 'none'; // Garante que o modal esteja escondido
+            gameScreen.style.display = 'flex'; // Exibe a tela do jogo
             playerSprite.src = selectedClass.image; // Define o sprite do jogador
             updateAllUI();
         }
