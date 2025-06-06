@@ -479,12 +479,73 @@
                 goblin: { name: "Goblin Ardiloso", level: 2, hp: 30, maxHp: 30, attack: 8, defense: 2, lootTable: [{ item: "Poção de Cura Pequena", chance: 0.3 }], image: "https://placehold.co/100x100/666/FFF?text=Goblin" },
                 orc: { name: "Orc Brutal", level: 3, hp: 50, maxHp: 50, attack: 12, defense: 4, lootTable: [{ item: "Adaga Enferrujada", chance: 0.5 }], image: "https://placehold.co/100x100/666/FFF?text=Orc" },
                 caveBoss: { name: "Boss da Caverna", level: 5, hp: 150, maxHp: 150, attack: 20, defense: 8, lootTable: [{ item: "Poção de Cura Grande", chance: 1.0 }, { item: "Espada Flamejante", chance: 0.7 }], image: "https://placehold.co/120x120/800/FFF?text=BOSS" },
+                
+                // Novos Monstros Adicionados
+                zombieOgre: { name: "Ogro Zumbi", level: 2, hp: 85, maxHp: 85, attack: 6, defense: 3, 
+                    lootTable: [
+                        { item: "Cristal pútrido", chance: 0.2 },
+                        { item: "Armadura corroída", chance: 0.1 },
+                        // Ouro podre será adicionado diretamente ao ouro do jogador em handleLoot
+                        { item: "Fragmento de runa necromântica", chance: 0.05 }
+                    ], 
+                    image: "https://placehold.co/120x120/4a6d4e/FFF?text=Zumbi" 
+                },
+                yuanTi: { name: "Yuan-ti Puro-Sangue", level: 3, hp: 40, maxHp: 40, attack: 4, defense: 2, 
+                    lootTable: [
+                        { item: "Poção de veneno", chance: 0.3 },
+                        { item: "Medalhão de serpente", chance: 0.15 },
+                        { item: "Escamas de yuan-ti", chance: 0.2 }
+                    ], 
+                    image: "https://placehold.co/120x120/8b4513/FFF?text=Yuan-ti" 
+                },
+                youngRedDragon: { name: "Dragão Vermelho Jovem", level: 10, hp: 178, maxHp: 178, attack: 10, defense: 6, 
+                    lootTable: [
+                        { item: "Escamas vermelhas", chance: 0.8 },
+                        { item: "Cristais de fogo", chance: 0.6 },
+                        // Tesouro será adicionado diretamente ao ouro do jogador em handleLoot
+                        { item: "Osso de dragão", chance: 0.4 }
+                    ], 
+                    image: "https://placehold.co/120x120/CC0000/FFF?text=Dragao" 
+                },
+                minorDeathKnight: { name: "Cavaleiro da Morte Menor", level: 5, hp: 95, maxHp: 95, attack: 7, defense: 4, 
+                    lootTable: [
+                        { item: "Espada das Trevas", chance: 0.25 },
+                        { item: "Elmo Amaldiçoado", chance: 0.15 },
+                        { item: "Anel de resistência necrótica", chance: 0.1 }
+                    ], 
+                    image: "https://placehold.co/120x120/333333/FFF?text=Cavaleiro" 
+                },
+                griffon: { name: "Grifo", level: 2, hp: 59, maxHp: 59, attack: 6, defense: 3, 
+                    lootTable: [
+                        { item: "Pena mágica de grifo", chance: 0.3 },
+                        { item: "Ovo de grifo", chance: 0.05 },
+                        { item: "Couro de grifo", chance: 0.2 }
+                    ], 
+                    image: "https://placehold.co/120x120/87CEEB/FFF?text=Grifo" 
+                },
             },
             items: {
                 "Poção de Cura Pequena": { type: "potion", effect: "heal", power: 20, consumable: true },
                 "Poção de Cura Grande": { type: "potion", effect: "heal", power: 50, consumable: true },
                 "Adaga Enferrujada": { type: "weapon", attackBonus: 5 },
                 "Espada Flamejante": { type: "weapon", attackBonus: 15 },
+
+                // Novos Itens Adicionados
+                "Cristal pútrido": { type: "component", description: "Um cristal escuro que emana energia necromântica." },
+                "Armadura corroída": { type: "armor", defenseBonus: 2, description: "Uma armadura gasta, mas que ainda oferece alguma proteção." },
+                "Fragmento de runa necromântica": { type: "component", description: "Um pequeno pedaço de uma runa que pulsa com magia da morte." },
+                "Poção de veneno": { type: "potion", effect: "damageEnemy", power: 10, consumable: true, description: "Uma poção que pode ser arremessada para causar dano de veneno." },
+                "Medalhão de serpente": { type: "trinket", description: "Um medalhão estranho com um símbolo de serpente." },
+                "Escamas de yuan-ti": { type: "component", description: "Escamas esverdeadas, usadas em alquimia ou artesanato." },
+                "Escamas vermelhas": { type: "material", description: "Escamas duras e brilhantes de um dragão, valiosas para criar itens lendários." },
+                "Cristais de fogo": { type: "component", description: "Cristais incandescentes, fonte de energia mágica." },
+                "Osso de dragão": { type: "material", description: "Um grande osso, pode ser transformado em armas ou varinhas poderosas." },
+                "Pena mágica de grifo": { type: "component", description: "Uma pena iridescente que vibra com magia do vento." },
+                "Ovo de grifo": { type: "valuables", description: "Um ovo grande e pesado, extremamente valioso." },
+                "Couro de grifo": { type: "material", description: "Couro resistente, ideal para armaduras leves e flexíveis." },
+                "Espada das Trevas": { type: "weapon", attackBonus: 8, description: "Uma espada que irradia uma aura escura." }, // Corresponde a uma espada +1
+                "Elmo Amaldiçoado": { type: "armor", defenseBonus: 3, description: "Um elmo antigo que parece prender sussurros macabros." },
+                "Anel de resistência necrótica": { type: "ring", description: "Um anel simples que oferece proteção contra energia da morte." },
             }
         };
 
@@ -786,6 +847,30 @@
                 logEvent(`Você usou ${itemName} e recuperou ${healAmount} de HP.`, 'heal');
                 removeItemFromInventory(itemName);
                 updateAllUI();
+            } else if (itemInfo.type === "potion" && itemInfo.effect === "damageEnemy") { // Novo: Poção de Dano
+                if (!gameData.inCombat) {
+                    logEvent("Você só pode usar poções de dano em combate.", 'info');
+                    return;
+                }
+                const enemy = gameData.currentEnemy;
+                const damageAmount = itemInfo.power;
+                enemy.hp -= damageAmount;
+                logEvent(`Você usou ${itemName} e causou ${damageAmount} de dano a ${enemy.name}!`, 'player_damage');
+                removeItemFromInventory(itemName);
+                if (enemy.hp <= 0) {
+                    enemy.hp = 0;
+                    logEvent(`${enemy.name} foi derrotado!`, 'success');
+                    gameData.player.monstersSlain++;
+                    gainXp(enemy.level * 20 + (enemy.name.includes("Boss") ? 100 : 0));
+                    gameData.player.gold += enemy.level * 5 + Math.floor(Math.random() * 10);
+                    logEvent(`Você encontrou ${enemy.level * 5 + Math.floor(Math.random() * 10)} de ouro.`, 'info');
+                    handleLoot(enemy);
+                    endCombat();
+                    checkBossSpawn();
+                } else {
+                    setTimeout(enemyTurn, 700);
+                }
+                updateAllUI();
             } else if (itemInfo.type === "weapon") {
                 // Se já houver uma arma equipada, guarda-a de volta no inventário
                 if (player.equippedWeapon) {
@@ -848,9 +933,10 @@
                 enemy.hp = 0; // Garante que a HP não seja negativa na UI
                 logEvent(`${enemy.name} foi derrotado!`, 'success');
                 gameData.player.monstersSlain++; // Incrementa o contador de monstros abatidos
-                gainXp(enemy.level * 20 + (enemy.name.includes("Boss") ? 100 : 0)); // Exemplo de XP, mais XP para bosses
-                gameData.player.gold += enemy.level * 5 + Math.floor(Math.random() * 10); // Ganho de ouro
-                logEvent(`Você encontrou ${enemy.level * 5 + Math.floor(Math.random() * 10)} de ouro.`, 'info');
+                // Ganho de XP e ouro baseado no nível do inimigo e se é um boss
+                gainXp(enemy.level * 20 + (enemy.name.includes("Boss") || enemy.name.includes("Dragão") || enemy.name.includes("Cavaleiro da Morte") ? 100 : 0)); 
+                gameData.player.gold += enemy.level * 5 + Math.floor(Math.random() * 10) + (enemy.name.includes("Ogro Zumbi") ? 25 : 0) + (enemy.name.includes("Dragão Vermelho Jovem") ? 500 : 0); 
+                logEvent(`Você encontrou ${enemy.level * 5 + Math.floor(Math.random() * 10) + (enemy.name.includes("Ogro Zumbi") ? 25 : 0) + (enemy.name.includes("Dragão Vermelho Jovem") ? 500 : 0)} de ouro.`, 'info');
                 handleLoot(enemy); // Lida com o saque do inimigo
                 endCombat();
                 checkBossSpawn(); // Verifica se é hora de aparecer um boss
@@ -932,9 +1018,9 @@
                  gameData.currentEnemy.hp = 0;
                  logEvent(`${gameData.currentEnemy.name} foi derrotado!`, 'success');
                  gameData.player.monstersSlain++;
-                 gainXp(gameData.currentEnemy.level * 20 + (gameData.currentEnemy.name.includes("Boss") ? 100 : 0));
-                 gameData.player.gold += gameData.currentEnemy.level * 5 + Math.floor(Math.random() * 10);
-                 logEvent(`Você encontrou ${gameData.currentEnemy.level * 5 + Math.floor(Math.random() * 10)} de ouro.`, 'info');
+                 gainXp(gameData.currentEnemy.level * 20 + (gameData.currentEnemy.name.includes("Boss") || gameData.currentEnemy.name.includes("Dragão") || gameData.currentEnemy.name.includes("Cavaleiro da Morte") ? 100 : 0));
+                 gameData.player.gold += gameData.currentEnemy.level * 5 + Math.floor(Math.random() * 10) + (gameData.currentEnemy.name.includes("Ogro Zumbi") ? 25 : 0) + (gameData.currentEnemy.name.includes("Dragão Vermelho Jovem") ? 500 : 0);
+                 logEvent(`Você encontrou ${gameData.currentEnemy.level * 5 + Math.floor(Math.random() * 10) + (gameData.currentEnemy.name.includes("Ogro Zumbi") ? 25 : 0) + (gameData.currentEnemy.name.includes("Dragão Vermelho Jovem") ? 500 : 0)} de ouro.`, 'info');
                  handleLoot(gameData.currentEnemy);
                  endCombat();
                  checkBossSpawn();
@@ -979,7 +1065,12 @@
         /** Simula a exploração da caverna, podendo encontrar um inimigo. */
         function explore() {
             logEvent("Você explora as profundezas da caverna...", 'info');
-            const enemiesList = Object.values(gameData.enemies).filter(e => !e.name.includes("Boss")); // Exclui bosses da exploração normal
+            // Filtra inimigos: exclui bosses e inimigos de alto nível para a exploração normal
+            const enemiesList = Object.values(gameData.enemies).filter(e => 
+                !e.name.includes("Boss") && 
+                !e.name.includes("Dragão") && // Exclui o Dragão Vermelho Jovem
+                !e.name.includes("Cavaleiro da Morte") // Exclui o Cavaleiro da Morte Menor
+            );
             
             // 70% de chance de encontrar um inimigo, 30% de chance de não encontrar nada
             if (Math.random() < 0.7) {
@@ -993,7 +1084,7 @@
         /** Verifica se as condições para o surgimento de um chefe foram atendidas. */
         function checkBossSpawn() {
             const player = gameData.player;
-            // Exemplo: Boss aparece após 5 monstros comuns abatidos
+            // Exemplo: Boss da Caverna aparece após 5 monstros comuns abatidos
             if (player.monstersSlain >= 5 && !gameData.enemies.caveBoss.isSpawned) {
                 logEvent("Uma presença sombria e poderosa se aproxima!", 'important');
                 showModal("Você sente um tremor na caverna... Algo GRANDE está vindo!", () => {
