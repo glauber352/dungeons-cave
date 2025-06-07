@@ -506,7 +506,12 @@
                         { item: "Osso de dragão", chance: 0.4 }
                     ], 
                     image: "https://placehold.co/120x120/CC0000/FFF?text=Dragao" 
-                },
+                    },
+                    Monster Calu: { name: "monstro Calu", level: 490, hp: 530, maxHp: 5000, attack: 40, defense: 390, 
+                    lootTable: [
+                        { item: "Pé de pato", chance: 80 },
+                     ],
+                     },
                 minorDeathKnight: { name: "Cavaleiro da Morte Menor", level: 5, hp: 95, maxHp: 95, attack: 7, defense: 4, 
                     lootTable: [
                         { item: "Espada das Trevas", chance: 0.25 },
